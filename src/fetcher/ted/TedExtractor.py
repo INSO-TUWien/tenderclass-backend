@@ -47,6 +47,7 @@ class TedExtractor:
 
             title = None
             short_desc = None
+            link = None
 
             # first format of contract
             try:
@@ -99,7 +100,6 @@ class TedExtractor:
                 link = extract_text(xml_doc.findAll(re.compile("URI_DOC"), {"LG": lg})[0])
             except:
                 logger.debug(f"could not parse link for language {lg}")
-
 
             tender.add_language_entity(lg, title, short_desc, link)
 

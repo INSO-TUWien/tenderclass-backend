@@ -1,6 +1,4 @@
-from typing import List
 from sklearn.metrics import confusion_matrix
-import numpy as np
 import pandas as pd
 import logging
 
@@ -43,7 +41,7 @@ class TransformerModel:
         predictions, raw_output = self.model.predict(titles)
         tuples = zip(tenders, predictions)
 
-        selected_tenders = [t for t,p in tuples if p == 1]
+        selected_tenders = [t for t, p in tuples if p == 1]
         return selected_tenders
 
     def train(self, labelled_tenders):
@@ -53,8 +51,8 @@ class TransformerModel:
         tenders = self.__convert_to_input(tenders)
         labels = [j for i, j in labelled_tenders]
 
-
-        tenders_train, tenders_test, labels_train, labels_test = train_test_split(tenders, labels, test_size=0.1, random_state=42)
+        tenders_train, tenders_test, labels_train, labels_test = train_test_split(tenders, labels, test_size=0.1,
+                                                                                  random_state=42)
 
         data_input = pd.DataFrame(zip(tenders_train, labels_train))
 
@@ -64,8 +62,6 @@ class TransformerModel:
         tn, fp, fn, tp = confusion_matrix(labels_test, labels_pred).ravel()
         logger.info(f"tn: {tn} fp: {fp}")
         logger.info(f"fn: {fn} tp:{tp}")
-
-
 
     def create_new_model(self):
         from simpletransformers.classification import ClassificationModel

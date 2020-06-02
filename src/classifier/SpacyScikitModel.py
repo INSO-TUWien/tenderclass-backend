@@ -1,8 +1,6 @@
 import joblib
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import accuracy_score
 from sklearn.base import TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
@@ -11,7 +9,6 @@ from sklearn.metrics import confusion_matrix
 import spacy
 import string
 import logging
-import numpy as np
 
 logger = logging.getLogger(__name__)
 

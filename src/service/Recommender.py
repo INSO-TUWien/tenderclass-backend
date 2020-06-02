@@ -1,6 +1,4 @@
-from src.classifier.TransformerModel import TransformerModel
 from src.fetcher.Fetcher import Fetcher
-from datetime import datetime
 
 
 class Recommender:
