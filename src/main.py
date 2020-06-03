@@ -1,8 +1,3 @@
-# Use src path so that the python interpreter can access all modules
-import os
-import sys
-sys.path.append(os.getcwd()[:os.getcwd().index('src')])
-
 # import dependencies
 from flask import Flask
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -31,7 +26,7 @@ CORS(app)
 
 # set up Swagger documentation
 SWAGGER_URL = '/swagger'
-API_URL = '/static/swagger.json'
+API_URL = '/static/swagger.yaml'
 SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,

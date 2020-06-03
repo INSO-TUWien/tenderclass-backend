@@ -1,3 +1,8 @@
+# Use src path so that the python interpreter can access all modules
+import os
+import sys
+sys.path.append(os.getcwd()[:os.getcwd().index('src')])
+
 from src.classifier.SpacyScikitModel import SpacyScikitModel
 
 from src.persistence.Persistence import Persistence
