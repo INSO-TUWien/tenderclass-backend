@@ -19,14 +19,14 @@ logger.info("start tenderclass-backend")
 
 #setup routes
 app = Flask(__name__)
-app.register_blueprint(model_blueprint, url_prefix="/api/v1/model")
-app.register_blueprint(web_blueprint, url_prefix="/api/v1/web")
-app.register_blueprint(persistence_blueprint, url_prefix="/api/v1/persistence")
+app.register_blueprint(model_blueprint, url_prefix="/api/v2/model")
+app.register_blueprint(web_blueprint, url_prefix="/api/v2/web")
+app.register_blueprint(persistence_blueprint, url_prefix="/api/v2/persistence")
 CORS(app)
 
 # set up Swagger documentation
 SWAGGER_URL = '/swagger'
-API_URL = '/static/swagger.yaml'
+API_URL = '/static/api.yaml'
 SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,

@@ -7,6 +7,7 @@ info:
     email: e11709460@student.tuwien.ac.at
 servers:
   - url: 'http://localhost:5000/api/v1'
+  - url: 'http://localhost:5000/api/v2'
 tags:
   - name: ML Model
     description: API for the Machine Learning Model
