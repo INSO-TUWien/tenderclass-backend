@@ -5,9 +5,9 @@ from flask_cors import CORS
 import logging
 
 # import routes
-from src.routes.v1.model import model_blueprint
-from src.routes.v1.persistence import persistence_blueprint
-from src.routes.v1.web import web_blueprint
+from src.routes.v2.model import model_blueprint
+from src.routes.v2.persistence import persistence_blueprint
+from src.routes.v2.web import web_blueprint
 
 # set up logging
 logger = logging.getLogger(__name__)

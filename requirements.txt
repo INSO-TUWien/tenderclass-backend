@@ -9,3 +9,4 @@ lxml
 flask_cors
 requests~=2.23.0
 pandas~=1.0.4
+marshmallow~=3.6.1
