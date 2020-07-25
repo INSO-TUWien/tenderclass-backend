@@ -16,7 +16,7 @@ class TedFetcher:
         self.ted_downloader = TedDownloader()
         self.ted_extractor = TedExtractor()
 
-    def get(self, count: int, load_documents: bool = False, search_criteria: str = "", languages: List[str] = ["DE"],
+    def get(self, count: int, load_documents: bool = False, search_criteria: str = "", languages: List[str] = ["DE", "EN"],
             page_offset: int = 0):
 
         if count <= 0:

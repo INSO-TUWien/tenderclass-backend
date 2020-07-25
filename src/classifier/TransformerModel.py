@@ -4,6 +4,8 @@ import logging
 
 from sklearn.model_selection import train_test_split
 
+from src.classifier.interfaces.MLModelInterface import MlModelInterface
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -13,7 +15,7 @@ args = {
 }
 
 
-class TransformerModel:
+class TransformerModel(MlModelInterface):
     """
     This class provides the Machine Learning model and classifies tenders based on previous training data.
     """
@@ -51,8 +53,7 @@ class TransformerModel:
         tenders = self.__convert_to_input(tenders)
         labels = [j for i, j in labelled_tenders]
 
-        tenders_train, tenders_test, labels_train, labels_test = train_test_split(tenders, labels, test_size=0.1,
-                                                                                  random_state=42)
+        tenders_train, tenders_test, labels_train, labels_test = train_test_split(tenders, labels, test_size=0.1, random_state=42)
 
         data_input = pd.DataFrame(zip(tenders_train, labels_train))
 
