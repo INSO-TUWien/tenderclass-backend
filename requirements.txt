@@ -12,3 +12,6 @@ pandas~=1.0.4
 marshmallow~=3.7.1
 nltk
 sklearn
+torch
+torchvision
+wandb

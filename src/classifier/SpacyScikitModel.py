@@ -5,7 +5,7 @@ from sklearn.base import TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score
 import spacy
 import string
 import logging
@@ -14,7 +14,7 @@ from src.classifier.interfaces.MLModelInterface import MlModelInterface
 
 logger = logging.getLogger(__name__)
 
-LANGUAGE = "DE"
+LANGUAGE = "EN"
 MODEL_NAME = "scikit_model"
 punctuations = string.punctuation
 
@@ -71,7 +71,7 @@ class SpacyScikitModel(MlModelInterface):
             self.pipe = joblib.load(MODEL_NAME)
 
     def __convert_to_input(self, tenders):
-        titles = list(map(lambda x: x.get_title("DE"), tenders))
+        titles = list(map(lambda x: x.get_title(LANGUAGE), tenders))
         return titles
 
     def classify(self, tenders):
@@ -104,6 +104,9 @@ class SpacyScikitModel(MlModelInterface):
         logger.info(f"tn: {tn} fp: {fp}")
         logger.info(f"fn: {fn} tp:{tp}")
         joblib.dump(self.pipe, MODEL_NAME)
+
+        print("Score:")
+        print(accuracy_score(y_test, y_pred))
 
     def create_new_model(self):
         vectorizer = CountVectorizer(tokenizer=self.spacy_tokenizer, ngram_range=(1, 2))
