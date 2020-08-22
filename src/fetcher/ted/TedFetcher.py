@@ -26,7 +26,7 @@ class TedFetcher:
         page = 1
         last_docs_count = -1
 
-        while last_docs_count != len(ted_docs):
+        while last_docs_count < len(ted_docs):
             last_docs_count = len(ted_docs)
 
             xml_docs = self.ted_downloader.get_xml_contracts(page, self.MAX_PAGE_COUNT, search_criteria, page_offset)
@@ -50,7 +50,7 @@ class TedFetcher:
 
                         ted_docs.append(doc)
 
-                        if len(ted_docs) == count:
+                        if len(ted_docs) >= count:
                             return ted_docs
             page += 1
 

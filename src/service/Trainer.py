@@ -1,3 +1,6 @@
+import pickle
+
+from src import config
 from src.classifier.TransformerModel import TransformerModel
 from src.fetcher.Fetcher import Fetcher
 import random
@@ -30,18 +33,25 @@ class Trainer:
         if (pos_number + neg_number) == 0:
             return
 
-        pos_tenders = self.tender_fetcher.get(pos_number, search_criteria=pos_search_criteria)
-        neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
+        if config.develop:
+            labelled_tenders = self.load_obj()
+        else:
+            pos_tenders = self.tender_fetcher.get(pos_number, search_criteria=pos_search_criteria)
+            neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
 
-        pos_labels = [1]*len(pos_tenders)
-        neg_labels = [0]*len(neg_tenders)
+            pos_labels = [1] * len(pos_tenders)
+            neg_labels = [0] * len(neg_tenders)
 
-        labelled_tenders = list(zip(pos_tenders, pos_labels)) + list(zip(neg_tenders, neg_labels))
+            labelled_tenders = list(zip(pos_tenders, pos_labels)) + list(zip(neg_tenders, neg_labels))
 
         random.shuffle(labelled_tenders)
 
         self.tender_model.train(labelled_tenders)
         logger.info("tenders successfully downloaded and labelled")
+
+    def load_obj(self):
+        with open('./dev/labelled_tenders.pkl', 'rb') as f:
+            return pickle.load(f)
 
     def train_from_entities(self, neg_tenders, pos_tenders):
         pos_labels = [1] * len(pos_tenders)
@@ -52,5 +62,3 @@ class Trainer:
         random.shuffle(labelled_tenders)
 
         self.tender_model.train(labelled_tenders)
-
-
