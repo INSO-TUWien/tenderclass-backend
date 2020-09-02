@@ -13,4 +13,4 @@ class LabelledTenderCollection:
         return [i for i, j in self.labelled_tenders]
 
     def get_labels(self):
-        return [j for i, j in self.labelled_tenders]
+        return [int(j) for i, j in self.labelled_tenders]
