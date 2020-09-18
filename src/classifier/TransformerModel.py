@@ -1,6 +1,7 @@
 from sklearn.metrics import confusion_matrix
 import pandas as pd
 import logging
+import torch
 
 from sklearn.model_selection import train_test_split
 
@@ -11,9 +12,11 @@ logger.setLevel(logging.INFO)
 
 args = {
     'learning_rate': 1e-4,
-    'overwrite_output_dir': True
+    'overwrite_output_dir': True,
+    'fp16': False
 }
 
+cuda_available = torch.cuda.is_available()
 
 class TransformerModel(MlModelInterface):
     """
@@ -24,7 +27,7 @@ class TransformerModel(MlModelInterface):
         if not self.model:
             from simpletransformers.classification import ClassificationModel
             try:
-                self.model = ClassificationModel('bert', './outputs/', use_cuda=False, args=args)
+                self.model = ClassificationModel('bert', './outputs/', use_cuda=cuda_available, args=args)
             except Exception as ex:
                 logger.error(f"could not load model from /outputs due to {str(ex)}, creating new model")
                 self.create_new_model()
@@ -66,4 +69,4 @@ class TransformerModel(MlModelInterface):
 
     def create_new_model(self):
         from simpletransformers.classification import ClassificationModel
-        self.model = ClassificationModel('bert', 'bert-base-german-cased', use_cuda=False, args=args)
+        self.model = ClassificationModel('bert', 'bert-base-german-cased', use_cuda=cuda_available, args=args)
