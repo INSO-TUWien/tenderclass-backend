@@ -1,7 +1,8 @@
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score
 import pandas as pd
 import logging
 import torch
+import time
 
 from sklearn.model_selection import train_test_split
 
@@ -60,12 +61,18 @@ class TransformerModel(MlModelInterface):
 
         data_input = pd.DataFrame(zip(tenders_train, labels_train))
 
+        start = time.time()
         self.model.train_model(data_input)
+        end = time.time()
+
+        print(end - start)
 
         labels_pred, raw_output = self.model.predict(tenders_test)
         tn, fp, fn, tp = confusion_matrix(labels_test, labels_pred).ravel()
         logger.info(f"tn: {tn} fp: {fp}")
         logger.info(f"fn: {fn} tp:{tp}")
+
+        logger.info(f"Accuracy Score: {accuracy_score(labels_test, labels_pred)}")
 
     def create_new_model(self):
         from simpletransformers.classification import ClassificationModel

@@ -16,7 +16,7 @@ from src.service.Recommender import Recommender
 from src.service.Trainer import Trainer
 
 # TODO: select the Machine Learning model
-tender_model = FullTextSvmModel()
+tender_model = FullTextBertModel()
 # tender_model = TransformerModel()
 
 tender_recommender = Recommender(tender_model)
