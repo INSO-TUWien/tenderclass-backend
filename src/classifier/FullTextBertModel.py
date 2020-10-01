@@ -4,7 +4,7 @@ import pandas as pd
 import torch
 from sklearn.model_selection import train_test_split
 from torch.utils.data import TensorDataset, RandomSampler, DataLoader, SequentialSampler
-from transformers import DistilBertModel, DistilBertTokenizer
+from transformers import DistilBertModel, DistilBertTokenizer, AutoTokenizer, AutoModel
 from transformers import AdamW, get_linear_schedule_with_warmup
 
 from src.classifier.interfaces.MLModelInterface import MlModelInterface
@@ -15,10 +15,12 @@ class FullTextBertModel(MlModelInterface):
 
     def __init__(self):
         # Load the BERT tokenizer
-        self.tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')
-        self.bertmodel = DistilBertModel.from_pretrained('distilbert-base-uncased')
+        self.tokenizerLong = AutoTokenizer.from_pretrained("allenai/longformer-base-4096")
+        self.modelLong = AutoModel.from_pretrained("allenai/longformer-base-4096")
+        self.tokenizerShort = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+        self.modelShort = AutoModel.from_pretrained("distilbert-base-uncased")
         self.max_len = 128
-        self.batch_size = 16
+        self.batch_size = 32
         self.epochs = 4
         self.evaluation = True
         self.loss_fn = torch.nn.CrossEntropyLoss()
@@ -65,7 +67,7 @@ class FullTextBertModel(MlModelInterface):
 
         #train
         # Instantiate Bert Classifier
-        bert_classifier = PyTorchTransformer(bertmodel=self.bertmodel, freeze_bert=True)
+        bert_classifier = PyTorchTransformer(modelLong=self.modelLong, modelShort=self.modelShort, freeze_bert=True)
 
         # Tell PyTorch to run the model on GPU
         bert_classifier.to(self.device)
@@ -228,7 +230,7 @@ class FullTextBertModel(MlModelInterface):
             #    (4) Map tokens to their IDs
             #    (5) Create attention mask
             #    (6) Return a dictionary of outputs
-            encoded_sent = self.tokenizer.encode_plus(
+            encoded_sent = self.tokenizerShort.encode_plus(
                 truncation=True,
                 text=text,  # Preprocess sentence
                 add_special_tokens=True,  # Add `[CLS]` and `[SEP]`

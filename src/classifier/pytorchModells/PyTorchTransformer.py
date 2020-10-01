@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 
@@ -6,7 +7,7 @@ class PyTorchTransformer(nn.Module):
     """Bert Model for Classification Tasks.
     """
 
-    def __init__(self, bertmodel, freeze_bert=False):
+    def __init__(self, modelLong, modelShort, freeze_bert=False):
         """
         @param    bert: a BertModel object
         @param    classifier: a torch.nn.Module classifier
@@ -17,19 +18,20 @@ class PyTorchTransformer(nn.Module):
         D_in, H, D_out = 768, 50, 2
 
         # Instantiate BERT model
-        self.bert = bertmodel
+        self.bertTitles = modelShort
+        self.bertDescriptions = modelShort
 
         # Instantiate an one-layer feed-forward classifier
         self.classifier = nn.Sequential(
-            nn.Linear(D_in, H),
+            nn.Linear(D_in*2, H),
             nn.ReLU(),
-            # nn.Dropout(0.5),
+            ##nn.Dropout(0.5),
             nn.Linear(H, D_out)
         )
 
         # Freeze the BERT model
         if freeze_bert:
-            for param in self.bert.parameters():
+            for param in self.bertTitles.parameters():
                 param.requires_grad = False
 
     def forward(self, input_ids, attention_mask):
@@ -43,13 +45,15 @@ class PyTorchTransformer(nn.Module):
                       num_labels)
         """
         # Feed input to BERT
-        outputs = self.bert(input_ids=input_ids,
-                            attention_mask=attention_mask)
+        outputsTitles = self.bertTitles(input_ids=input_ids,
+                                  attention_mask=attention_mask)
 
-        # Extract the last hidden state of the token `[CLS]` for classification task
-        last_hidden_state_cls = outputs[0][:, 0, :]
+        outputsDescriptions= self.bertTitles(input_ids=input_ids,
+                                        attention_mask=attention_mask)
+
+        concat_output = torch.cat((outputsTitles[0][:, 0, :], outputsDescriptions[0][:, 0, :]), dim=1)
 
         # Feed input to classifier to compute logits
-        logits = self.classifier(last_hidden_state_cls)
+        logits = self.classifier(concat_output)
 
         return logits
