@@ -20,15 +20,23 @@ class Tender:
         return cls(id, cpvs, lang_entities)
 
     def __init__(self, id: str, cpvs: List[str], lang_entities=None):
+        self.original_lang = None
+        self.original_lang_entity: TenderLanguageEntity = None
         self.id = id
         self.cpvs = cpvs
         if lang_entities is None:
             lang_entities = {}
         self.lang_entities = lang_entities
 
+
     def add_language_entity(self, language_key, title, description="", link=""):
         entity = TenderLanguageEntity(title, description, link)
         self.lang_entities[language_key] = entity
+
+    def set_original_language_entity(self, language_key, title, description="", link=""):
+        entity = TenderLanguageEntity(title, description, link)
+        self.original_lang_entity = entity
+        self.original_lang = language_key
 
     def get_title(self, language):
         return self.lang_entities[language].title

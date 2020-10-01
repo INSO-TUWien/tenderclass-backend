@@ -20,6 +20,9 @@ class TedExtractor:
     This class converts the xml version of one tender to the entity.
     """
 
+    def __init__(self):
+        self.tender = None
+
     def extract(self, xml_doc: Soup, languages: List[str]):
 
         # parse document id
@@ -40,7 +43,44 @@ class TedExtractor:
             logger.error(xml_doc.prettify())
             raise Exception("could not retrieve CPV for contract")
 
-        tender = Tender(tender_id, tender_cpvs)
+        self.tender = Tender(tender_id, tender_cpvs)
+
+        #extract original
+        try:
+            # extract original
+            original_section = xml_doc.findAll(attrs={"CATEGORY": "ORIGINAL"})
+            original_language = original_section[0]['LG']
+
+            #extract original title
+            original_title_ti_doc = original_section[0].findAll(re.compile("TITLE"))
+            if len(original_title_ti_doc) == 0:
+                original_title_ti_doc = original_section[0].findAll(re.compile("TI_DOC"))
+
+            #extract original short description
+            original_short_descr_ti_doc = original_section[0].findAll(re.compile("SHORT_DESCR"))
+            if len(original_short_descr_ti_doc) == 0:
+                original_short_descr_ti_doc = original_section[0].findAll(
+                    re.compile("SHORT_CONTRACT_DESCRIPTION"))
+
+            if len(original_short_descr_ti_doc) == 0:
+                original_short_descr_ti_doc = original_section[0].find_all(re.compile("TI_MARK"), string="Contract description:")
+                if len(original_short_descr_ti_doc) != 0:
+                    original_short_descr_ti_doc = [original_short_descr_ti_doc[0].findNext(re.compile("TXT_MARK"))]
+
+            #lastly get any description field
+            #if len(original_short_descr_ti_doc) == 0:
+                #original_short_descr_ti_doc = xml_doc.find_all(re.compile("TI_MARK"), text=re.compile("(?i)(?=.*(description))"))
+                #if len(original_short_descr_ti_doc) != 0:
+                    #original_short_descr_ti_doc = [original_short_descr_ti_doc[0].findNext(re.compile("TXT_MARK"))]
+
+            original_short_description = extract_text(original_short_descr_ti_doc[0]) if len(original_short_descr_ti_doc) != 0 else ""
+            original_title = extract_text(original_title_ti_doc[0]) if len(original_title_ti_doc) != 0 else ""
+
+            self.tender.set_original_language_entity(original_language, original_title, original_short_description)
+        except:
+            logger.error("Could not retrieve original language data for contract")
+            logger.error(xml_doc.prettify())
+            raise Exception("Could not retrieve original language data for contract")
 
         # extract title and description for each language
         for lg in languages:
@@ -53,10 +93,14 @@ class TedExtractor:
             try:
                 ml_titles_section = xml_doc.findAll(re.compile("ML_TITLES"))
                 if ml_titles_section:
+
+                    self.tender.set_original_language_entity(original_language, extract_text(original_title_ti_doc[0]), extract_text(original_short_descr_ti_doc[0]))
+
                     ml_ti_doc = ml_titles_section[0].findAll(re.compile("ML_TI_DOC"), {"LG": lg})
                     if ml_ti_doc:
                         ti_text = ml_ti_doc[0].findAll(re.compile("TI_TEXT"))[0]
                         title = extract_text(ti_text)
+
             except:
                 logger.debug(f"could not parse first format of contract {tender_id}")
 
@@ -101,6 +145,7 @@ class TedExtractor:
             except:
                 logger.debug(f"could not parse link for language {lg}")
 
-            tender.add_language_entity(lg, title, short_desc, link)
 
-        return tender
+            self.tender.add_language_entity(lg, title, short_desc, link)
+
+        return self.tender
