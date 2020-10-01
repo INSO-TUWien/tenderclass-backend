@@ -2,15 +2,9 @@
 import os
 import sys
 
-from src.classifier.FullTextModel import FullTextModel
-from src.classifier.FullTextBertModel import FullTextBertModel
-from src.classifier.FullTextSvmModel import FullTextSvmModel
 from src.classifier.Lighning.FullTextBertModelLighting import FullTextBertModelLightning
-from src.classifier.TransformerModel import TransformerModel
 
 sys.path.append(os.getcwd()[:os.getcwd().index('src')])
-
-from src.classifier.SpacyScikitModel import SpacyScikitModel
 
 from src.persistence.Persistence import Persistence
 from src.service.Recommender import Recommender

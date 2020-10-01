@@ -1,14 +1,14 @@
 import torch
 import torch.nn as nn
 from pytorch_lightning import LightningModule
-from transformers import AdamW
+from transformers import AdamW, get_linear_schedule_with_warmup
 
 
 class PyTorchTransformerLightning(LightningModule):
     """Bert Model for Classification Tasks.
     """
 
-    def __init__(self, modelLong, modelShort, freeze_bert=False):
+    def __init__(self, modelShort, modelLong, freeze_bert=False, total_steps=0):
         """
         @param    bert: a BertModel object
         @param    classifier: a torch.nn.Module classifier
@@ -19,22 +19,25 @@ class PyTorchTransformerLightning(LightningModule):
         D_in, H, D_out = 768, 50, 2
 
         self.loss_fn = torch.nn.CrossEntropyLoss()
+        self.total_steps = total_steps
 
         # Instantiate BERT model
-        self.bertTitles = modelShort
-        self.bertDescriptions = modelShort
+        self.bertTitles = modelLong
+        self.bertDescriptions = modelLong
 
         # Instantiate an one-layer feed-forward classifier
         self.classifier = nn.Sequential(
             nn.Linear(D_in * 2, H),
             nn.ReLU(),
-            ##nn.Dropout(0.5),
+            nn.Dropout(0.1),
             nn.Linear(H, D_out)
         )
 
         # Freeze the BERT model
         if freeze_bert:
             for param in self.bertTitles.parameters():
+                param.requires_grad = False
+            for param in self.bertDescriptions.parameters():
                 param.requires_grad = False
 
     def configure_optimizers(self):
@@ -43,9 +46,13 @@ class PyTorchTransformerLightning(LightningModule):
                           eps=1e-8  # Default epsilon value
                           )
 
-        return optimizer
+        scheduler = get_linear_schedule_with_warmup(optimizer,
+                                                    num_warmup_steps=0,  # Default value
+                                                    num_training_steps=self.total_steps)
 
-    def forward(self, input_ids, attention_mask):
+        return [optimizer], [scheduler]
+
+    def forward(self, title_input_ids, title_attention_masks, description_input_ids, description_attention_masks):
         """
         Feed input to BERT and the classifier to compute logits.
         @param    input_ids (torch.Tensor): an input tensor with shape (batch_size,
@@ -56,11 +63,11 @@ class PyTorchTransformerLightning(LightningModule):
                       num_labels)
         """
         # Feed input to BERT
-        outputsTitles = self.bertTitles(input_ids=input_ids,
-                                        attention_mask=attention_mask)
+        outputsTitles = self.bertTitles(input_ids=title_input_ids,
+                                        attention_mask=title_attention_masks)
 
-        outputsDescriptions = self.bertTitles(input_ids=input_ids,
-                                              attention_mask=attention_mask)
+        outputsDescriptions = self.bertDescriptions(input_ids=description_input_ids,
+                                              attention_mask=description_attention_masks)
 
         concat_output = torch.cat((outputsTitles[0][:, 0, :], outputsDescriptions[0][:, 0, :]), dim=1)
 
@@ -76,12 +83,31 @@ class PyTorchTransformerLightning(LightningModule):
         description_attention_masks = batch["description_attention_mask"]
         labels = batch["label"]
         # Perform a forward pass. This will return logits.
-        logits = self.forward(title_input_ids, title_attention_masks)
+        logits = self.forward(title_input_ids, title_attention_masks, description_input_ids, description_attention_masks)
+
+        # identifying number of correct predections in a given batch
+        correct = logits.argmax(dim=1).eq(labels).sum().item()
+
+        # identifying total number of labels in a given batch
+        total = len(labels)
 
         # Compute loss and accumulate the loss values
         loss = self.loss_fn(logits, labels)
         logs = {'train_loss': loss}
-        return {'loss': loss, 'logs': logs}
+
+        self.logger.experiment.add_scalar(f"Training -> Epoch {self.current_epoch}: Loss/Batch",
+                                          loss,
+                                          batch_idx)
+
+        self.logger.experiment.add_scalar(f"Training -> Epoch {self.current_epoch}: Accuracy/Batch",
+                                          correct / total,
+                                          batch_idx)
+
+        return {'loss': loss,
+                'logs': logs,
+                "correct": correct,
+                "total": total
+                }
 
     def validation_step(self, batch, batch_idx):
         title_input_ids = batch["title_input_ids"]
@@ -91,7 +117,7 @@ class PyTorchTransformerLightning(LightningModule):
         labels = batch["label"]
 
         # Perform a forward pass. This will return logits.
-        logits = self.forward(title_input_ids, title_attention_masks)
+        logits = self.forward(title_input_ids, title_attention_masks, description_input_ids, description_attention_masks)
 
         # Compute loss and accumulate the loss values
         loss = self.loss_fn(logits, labels)
@@ -99,6 +125,14 @@ class PyTorchTransformerLightning(LightningModule):
         #Compute the accuracy
         preds = torch.argmax(logits, dim=1).flatten()
         accuracy = torch.tensor((preds == labels).cpu().numpy().mean() * 100)
+
+        self.logger.experiment.add_scalar(f"Validation -> Epoch {self.current_epoch}: Loss/Batch",
+                                          loss,
+                                          batch_idx)
+
+        self.logger.experiment.add_scalar(f"Validation -> Epoch {self.current_epoch}: Accuracy/Batch",
+                                          accuracy,
+                                          batch_idx)
 
         return {'loss': loss, 'acc': accuracy}
 
