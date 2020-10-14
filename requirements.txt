@@ -10,8 +10,10 @@ flask_cors
 requests~=2.24.0
 pandas~=1.0.4
 marshmallow~=3.7.1
-nltk
-sklearn
-torch
+nltk~=3.5
+sklearn~=0.0
+torch~=1.6.0
 torchvision
 wandb
+matplotlib~=3.3.2
+transformers~=3.1.0
