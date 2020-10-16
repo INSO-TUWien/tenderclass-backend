@@ -2,7 +2,7 @@
 import os
 import sys
 
-from src.classifier.PytorchTransformer.FullTextBertModelLighting import FullTextBertModelLightning
+from src.classifier.FullTextTransformerModel import FullTextTransformerModel
 
 sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 
@@ -11,7 +11,7 @@ from src.service.Recommender import Recommender
 from src.service.Trainer import Trainer
 
 # TODO: select the Machine Learning model
-tender_model = FullTextBertModelLightning()
+tender_model = FullTextTransformerModel()
 # tender_model = TransformerModel()
 
 tender_recommender = Recommender(tender_model)

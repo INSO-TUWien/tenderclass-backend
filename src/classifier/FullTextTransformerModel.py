@@ -5,13 +5,13 @@ from torch.utils.data import DataLoader
 from pytorch_lightning.loggers import WandbLogger
 
 from src.classifier.PytorchTransformer.BertDataSet import BertDataSet
-from src.classifier.PytorchTransformer.PyTorchTransformerLighning import PyTorchTransformerLightning
+from src.classifier.PytorchTransformer.PyTorchLighningTransformer import PyTorchTransformerLightning
 from src.classifier.PytorchTransformer.config.PytorchTransformerConfig import PytorchTransformerConfig
 from src.classifier.interfaces.MLModelInterface import MlModelInterface
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 
 
-class FullTextBertModelLightning(MlModelInterface):
+class FullTextTransformerModel(MlModelInterface):
 
     def __init__(self):
         self.config: PytorchTransformerConfig = PytorchTransformerConfig.description_only()
