@@ -2,7 +2,7 @@
 import os
 import sys
 
-from src.classifier.Lighning.FullTextBertModelLighting import FullTextBertModelLightning
+from src.classifier.PytorchTransformer.FullTextBertModelLighting import FullTextBertModelLightning
 
 sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 

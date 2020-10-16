@@ -4,11 +4,11 @@ import pandas as pd
 import torch
 from sklearn.model_selection import train_test_split
 from torch.utils.data import TensorDataset, RandomSampler, DataLoader, SequentialSampler
-from transformers import DistilBertModel, DistilBertTokenizer, AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel
 from transformers import AdamW, get_linear_schedule_with_warmup
 
 from src.classifier.interfaces.MLModelInterface import MlModelInterface
-from src.classifier.pytorchModells.PyTorchTransformer import PyTorchTransformer
+from src.classifier.old.pytorchModells.PyTorchTransformer import PyTorchTransformer
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 
 class FullTextBertModel(MlModelInterface):
