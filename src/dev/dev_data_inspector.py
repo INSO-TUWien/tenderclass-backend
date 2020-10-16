@@ -10,8 +10,8 @@ class DevDATAInspector:
         labelled_tenders = self.load_obj()
         labelled_tenders_collection = LabelledTenderCollection(labelled_tenders)
         df = pd.DataFrame({"title": labelled_tenders_collection.get_titles(), "description": labelled_tenders_collection.get_descriptions(), "label": labelled_tenders_collection.get_labels()})
-        df["title_len"] = df["title"].str.len()
-        df["description_len"] = df["description"].str.len()
+        df["title_len"] = df["title"].str.split().str.len()
+        df["description_len"] = df["description"].str.split().str.len()
 
         title_len_fig = plt.figure()
         df.boxplot(column=['title_len'])
