@@ -1,10 +1,9 @@
-import pickle
-
 from src import config
-from src.classifier.TransformerModel import TransformerModel
 from src.fetcher.Fetcher import Fetcher
 import random
 import logging
+
+from src.persistence.Persistence import Persistence
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -18,6 +17,7 @@ class Trainer:
     def __init__(self, tender_model):
         self.tender_fetcher = Fetcher()
         self.tender_model = tender_model
+        self.persistence = Persistence()
 
     def train(self, tender_ids, labels):
         search_arg = " OR ".join(tender_ids)
@@ -34,24 +34,20 @@ class Trainer:
             return
 
         if config.develop:
-            labelled_tenders = self.load_obj()
+            try:
+                pos_tenders = self.persistence.load("dev_pos_tenders.json")
+                neg_tenders = self.persistence.load("dev_neg_tenders.json")
+            except:
+                pos_tenders = self.tender_fetcher.get(pos_number, search_criteria=pos_search_criteria)
+                neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
+
+                self.persistence.save(pos_tenders, "dev_pos_tenders.json")
+                self.persistence.save(neg_tenders, "dev_neg_tenders.json")
         else:
             pos_tenders = self.tender_fetcher.get(pos_number, search_criteria=pos_search_criteria)
             neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
 
-            pos_labels = [1] * len(pos_tenders)
-            neg_labels = [0] * len(neg_tenders)
-
-            labelled_tenders = list(zip(pos_tenders, pos_labels)) + list(zip(neg_tenders, neg_labels))
-
-        random.shuffle(labelled_tenders)
-
-        self.tender_model.train(labelled_tenders)
-        logger.info("tenders successfully downloaded and labelled")
-
-    def load_obj(self):
-        with open('./dev/labelled_tenders.pkl', 'rb') as f:
-            return pickle.load(f)
+        self.train_from_entities(neg_tenders, pos_tenders)
 
     def train_from_entities(self, neg_tenders, pos_tenders):
         pos_labels = [1] * len(pos_tenders)
@@ -62,3 +58,4 @@ class Trainer:
         random.shuffle(labelled_tenders)
 
         self.tender_model.train(labelled_tenders)
+        logger.info("tenders successfully laoded and labelled")

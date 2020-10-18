@@ -7,3 +7,5 @@ runs/
 scikit_model
 cache_dir/
 __pycache__/
+wandb/
+src.iml

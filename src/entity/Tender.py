@@ -12,16 +12,21 @@ class Tender:
     @classmethod
     def from_json_dict(cls, serialized_dict):
         id = serialized_dict["id"]
+        original_lang = serialized_dict["original_lang"]
         cpvs = serialized_dict["cpvs"]
         lang_entities = {}
-        for e in serialized_dict["languageentities"]:
-            lang_entry = TenderLanguageEntity(e["title"], e["description"])
-            lang_entities[e["language"]] = lang_entry
-        return cls(id, cpvs, lang_entities)
 
-    def __init__(self, id: str, cpvs: List[str], lang_entities=None):
-        self.original_lang = None
-        self.original_lang_entity: TenderLanguageEntity = None
+        serialized_original_lang_entity = serialized_dict["original_lang_entity"]
+        original_lang_entity = TenderLanguageEntity.from_json_dict(serialized_original_lang_entity)
+
+        for e in serialized_dict["languageentities"]:
+            lang_entry = TenderLanguageEntity(e["title"], e["description"], e["link"])
+            lang_entities[e["language"]] = lang_entry
+        return cls(id, cpvs, lang_entities, original_lang, original_lang_entity)
+
+    def __init__(self, id: str, cpvs: List[str], lang_entities=None, original_lang=None, original_lang_entity=None):
+        self.original_lang = original_lang
+        self.original_lang_entity: TenderLanguageEntity = original_lang_entity
         self.id = id
         self.cpvs = cpvs
         if lang_entities is None:
@@ -45,8 +50,12 @@ class Tender:
         return self.lang_entities[language].description
 
     def get_dict(self):
-        contract = {"id": self.id, "cpvs": list(self.cpvs)}
+        contract = {"id": self.id, "cpvs": list(self.cpvs), "original_lang": self.original_lang}
         lang_list = []
+
+        original_lang_entity = self.original_lang_entity.get_dict()
+        contract["original_lang_entity"] = original_lang_entity
+
         for k, v in self.lang_entities.items():
             lang_entry = {"language": k, "title": v.title, "description": v.description, "link": v.link}
             lang_list.append(lang_entry)
