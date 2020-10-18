@@ -3,12 +3,12 @@ import os
 import sys
 
 from src.classifier.FullTextTransformerModel import FullTextTransformerModel
-
-sys.path.append(os.getcwd()[:os.getcwd().index('src')])
-
 from src.persistence.Persistence import Persistence
 from src.service.Recommender import Recommender
 from src.service.Trainer import Trainer
+
+sys.path.append(os.getcwd()[:os.getcwd().index('src')])
+
 
 # TODO: select the Machine Learning model
 tender_model = FullTextTransformerModel()
