@@ -9,3 +9,6 @@ cache_dir/
 __pycache__/
 wandb/
 src.iml
+/src/tb_logs/
+/src/tenderclass/
+/src/tenderclass-backend-src/

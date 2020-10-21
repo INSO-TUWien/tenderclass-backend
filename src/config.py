@@ -3,6 +3,7 @@ import os
 import sys
 
 from src.classifier.FullTextTransformerModel import FullTextTransformerModel
+from src.classifier.SpacyScikitModel import SpacyScikitModel
 from src.persistence.Persistence import Persistence
 from src.service.Recommender import Recommender
 from src.service.Trainer import Trainer

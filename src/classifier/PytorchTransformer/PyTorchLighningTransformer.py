@@ -43,6 +43,9 @@ class PyTorchTransformerLightning(LightningModule):
     def empty_model(self, input_ids, attention_mask):
         return None
 
+    def set_total_training_steps(self, training_steps):
+        self.total_steps = training_steps
+
     def configure_optimizers(self):
         optimizer = AdamW(self.parameters(),
                           lr=5e-5,  # Default learning rate

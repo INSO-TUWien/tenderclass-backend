@@ -4,7 +4,9 @@ from transformers import AutoTokenizer, AutoModel
 class PytorchTransformerConfig:
 
     def __init__(self, tokenizer_title, tokenizer_desc, model_title, model_desc, max_len_title=512, max_len_desc=512,
-                 batch_size=32, epochs=20, truncate=False, use_title=True, use_description=True, freeze_bert=True):
+                 batch_size=32, epochs=10, truncate=False, use_title=True, use_description=True, freeze_bert=True, name="Transformer-Model"):
+
+        self.name = name
         self.tokenizer_title = tokenizer_title
         self.tokenizer_desc = tokenizer_desc
         self.model_title = model_title
@@ -35,12 +37,12 @@ class PytorchTransformerConfig:
         tokenizer_title = AutoTokenizer.from_pretrained("distilbert-base-uncased")
         model_title = AutoModel.from_pretrained("distilbert-base-uncased")
         max_len_title = 75
-        max_len_desc = 512
+        max_len_desc = 300
         batch_size = 32
-        epochs = 20
+        epochs = 2
 
         return PytorchTransformerConfig(tokenizer_title, tokenizer_desc, model_title, model_desc, max_len_title,
-                                        max_len_desc, batch_size, epochs)
+                                        max_len_desc, batch_size, epochs, name="StandardModel")
 
     @classmethod
     def xlm_model(cls):
@@ -49,16 +51,24 @@ class PytorchTransformerConfig:
         tokenizer_title = AutoTokenizer.from_pretrained("distilbert-base-cased")
         model_title = AutoModel.from_pretrained("distilbert-base-cased")
         max_len_title = 75
-        max_len_desc = 512
+        max_len_desc = 300
         batch_size = 32
         epochs = 20
 
         return PytorchTransformerConfig(tokenizer_title, tokenizer_desc, model_title, model_desc, max_len_title,
-                                        max_len_desc, batch_size, epochs)
+                                        max_len_desc, batch_size, epochs, name="XLMModel")
 
     @classmethod
     def description_only(cls):
         tokenizer = AutoTokenizer.from_pretrained("bert-base-multilingual-uncased")
         model = AutoModel.from_pretrained("bert-base-multilingual-uncased")
 
-        return PytorchTransformerConfig(None, tokenizer, None, model, use_title=False, max_len_desc=300, batch_size=128)
+        return PytorchTransformerConfig(None, tokenizer, None, model, use_title=False, max_len_desc=300, batch_size=128, name="description_only")
+
+    @classmethod
+    def title_only(cls):
+        tokenizer = AutoTokenizer.from_pretrained("distilbert-base-cased")
+        model = AutoModel.from_pretrained("distilbert-base-cased")
+
+        return PytorchTransformerConfig(tokenizer, None, model, None, use_description=False, max_len_title=75, batch_size=128,
+                                        name="description_only")
