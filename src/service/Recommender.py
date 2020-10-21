@@ -13,7 +13,7 @@ class Recommender:
         self.cached_search_criteria = ""
 
     def get_recommendations(self, count, search_criteria = ""):
-        if not self.cached_selected_tenders or self.cached_selected_tenders != search_criteria:
+        if not self.cached_selected_tenders or self.cached_search_criteria != search_criteria:
             tenders = self.tender_fetcher.get(count, search_criteria=search_criteria)
             self.cached_selected_tenders = self.tender_model.classify(tenders)
         return self.cached_selected_tenders
