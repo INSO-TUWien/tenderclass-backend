@@ -38,6 +38,7 @@ class FullTextSvmModel(MlModelInterface):
 
         self.stopwords = list(STOP_WORDS)
         self.stopwords.extend(self.domain_stopwords)
+        self.model = None
 
     def spacy_tokenizer(self, sentence):
         sentence_tokens = self.parser(sentence)
@@ -62,7 +63,11 @@ class FullTextSvmModel(MlModelInterface):
             return {}
 
     def classify(self, tenders):
-        pass
+        titles = list(map(lambda x: x.get_title("EN"), tenders))
+        predictions = self.model.predict(titles)
+        tuples = zip(tenders, predictions)
+        selected_tenders = [t for t, p in tuples if p == 1]
+        return selected_tenders
 
     def train(self, labelled_tenders):
         labelled_tenders_collection = LabelledTenderCollection(labelled_tenders)
@@ -78,23 +83,6 @@ class FullTextSvmModel(MlModelInterface):
         training_df2 = training_df
         training_df2.loc[training_df2["descriptions"].isnull(), 'descriptions'] = training_df2["titles"]
         X2 = training_df[['titles', 'descriptions']]
-
-        #X2 text preprocessing
-        def clean(data):
-            data = re.sub(r'http\S+', '', data)
-            data = re.sub('[^a-zA-Z]', ' ', data)
-            data = str(data).lower()
-            data = nltk.word_tokenize(data)
-            data = [word for word in data if word not in self.stopwords and word not in punctuations]
-            data = [self.lemma.lemmatize(word=w, pos='v') for w in data]
-            data = [i for i in data if len(i) > 2]
-            data = ' '.join(data)
-            return data
-
-        #X2['titles'] = X2['titles'].apply(clean)
-        #X2['descriptions'] = X2['descriptions'].apply(clean)
-
-        #X2.to_csv('datacleaned.csv')
 
         ylabels2 = training_df['label']
         X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, ylabels2, test_size=0.1, random_state=0)
@@ -176,9 +164,9 @@ class FullTextSvmModel(MlModelInterface):
             ('svc', SVC(kernel="linear", random_state=0)),
         ])
 
-        model = pipeline
-        model.fit(X_train2, y_train2)
-        y_pred2 = model.predict(X_test2)
+        self.model = pipeline
+        self.model.fit(X_train2, y_train2)
+        y_pred2 = self.model.predict(X_test2)
         print("Newest Score:")
         print(accuracy_score(y_test2, y_pred2))
 
