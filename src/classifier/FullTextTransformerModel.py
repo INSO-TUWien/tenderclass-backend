@@ -18,7 +18,7 @@ from src.entity.Tender import Tender
 class FullTextTransformerModel(MlModelInterface):
 
     def __init__(self):
-        self.config: PytorchTransformerConfig = PytorchTransformerConfig.title_only()
+        self.config: PytorchTransformerConfig = PytorchTransformerConfig.train_bert_layers()
         self.model: PyTorchTransformerLightning = self.create_new_model()
 
     def classify(self, tenders: List[Tender]):
