@@ -1,8 +1,14 @@
 # import dependencies
+import os
+import sys
+
 from flask import Flask
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask_cors import CORS
 import logging
+
+# Use src path so that the python interpreter can access all modules
+sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 
 # import routes
 from src.routes.v2.model import model_blueprint
