@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from pytorch_lightning.loggers import WandbLogger
 
-from src.classifier.PytorchTransformer.data.BertDataSet import BertDataSet
+from src.classifier.PytorchTransformer.data_processing.BertDataSet import BertDataSet
 from src.classifier.PytorchTransformer.PyTorchLighningTransformer import PyTorchTransformerLightning
 from src.classifier.PytorchTransformer.config.PytorchTransformerConfig import PytorchTransformerConfig
 from src.classifier.interfaces.MLModelInterface import MlModelInterface
@@ -71,13 +71,13 @@ class FullTextTransformerModel(MlModelInterface):
         self.save_model()
 
     def save_model(self):
-        torch.save(self.model.state_dict(), "./data/" + self.config.name)
+        torch.save(self.model.state_dict(), "./data_processing/" + self.config.name)
 
     def create_new_model(self):
         self.model = PyTorchTransformerLightning(self.config)
 
         try:
-            self.model.load_state_dict(torch.load("./data/" + self.config.name))
+            self.model.load_state_dict(torch.load("./data_processing/" + self.config.name))
             self.model.eval()
         except:
             pass
