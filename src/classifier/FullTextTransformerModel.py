@@ -71,13 +71,13 @@ class FullTextTransformerModel(MlModelInterface):
         self.save_model()
 
     def save_model(self):
-        torch.save(self.model.state_dict(), "./data_processing/" + self.config.name)
+        torch.save(self.model.state_dict(), "./data/" + self.config.name)
 
     def create_new_model(self):
         self.model = PyTorchTransformerLightning(self.config)
 
         try:
-            self.model.load_state_dict(torch.load("./data_processing/" + self.config.name))
+            self.model.load_state_dict(torch.load("./data/" + self.config.name))
             self.model.eval()
         except:
             pass
