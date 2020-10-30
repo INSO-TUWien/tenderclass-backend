@@ -26,7 +26,12 @@ class TedExtractor:
     def extract(self, xml_doc: Soup, languages: List[str]):
 
         # parse document id
-        ted_export = xml_doc.findAll(re.compile("TED_EXPORT"))[0]
+        try:
+            ted_export = xml_doc.findAll(re.compile("TED_EXPORT"))[0]
+        except:
+            #can't retrieve notices issued before 2009
+            return None
+
         tender_id = "EU" + ted_export['DOC_ID']
 
         # parse cpv code

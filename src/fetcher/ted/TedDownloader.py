@@ -20,7 +20,7 @@ class TedDownloader:
 
         # CY=[UK or DE or AT] ... country filter
         querystring = {"fields": "CONTENT", "pageNum": str(page + page_offset), "pageSize": str(count),
-                       "q": "TD=[\"Contract notice\"]" + search_criteria, "reverseOrder": "false", "scope": 2,
+                       "q": "TD=[\"Contract notice\"]" + search_criteria, "reverseOrder": "true", "scope": 3,
                        "sortField": "ND"}
 
         response = requests.request("GET", self.TED_URL_SEARCH, params=querystring)
