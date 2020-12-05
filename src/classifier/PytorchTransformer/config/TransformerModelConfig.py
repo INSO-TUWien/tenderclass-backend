@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModel
 class PytorchTransformerConfig:
 
     def __init__(self, tokenizer_title, tokenizer_desc, model_title, model_desc, max_len_title=512, max_len_desc=512,
-                 batch_size=32, epochs=10, truncate=False, use_title=True, use_description=True, freeze_bert=True, name="Transformer-Model"):
+                 batch_size=32, epochs=10, truncate=False, use_title=True, use_description=True, freeze_pretrained_layers=True, name="Transformer-Model"):
 
         self.name = name
         self.tokenizer_title = tokenizer_title
@@ -18,7 +18,7 @@ class PytorchTransformerConfig:
         self.truncate = truncate
         self.use_title = use_title
         self.use_desc = use_description
-        self.freeze_bert = freeze_bert
+        self.freeze_pretrained_layers = freeze_pretrained_layers
 
         if self.use_desc is False:
             self.model_desc = None
@@ -31,7 +31,7 @@ class PytorchTransformerConfig:
         self.num_models = 2 if (self.use_title and self.use_desc) else 1
 
     @classmethod
-    def standard_model(cls):
+    def bert_multilang_frozen(cls):
         tokenizer_desc = AutoTokenizer.from_pretrained("bert-base-multilingual-uncased")
         model_desc = AutoModel.from_pretrained("bert-base-multilingual-uncased")
         tokenizer_title = AutoTokenizer.from_pretrained("distilbert-base-uncased")
@@ -45,7 +45,7 @@ class PytorchTransformerConfig:
                                         max_len_desc, batch_size, epochs, name="StandardModel")
 
     @classmethod
-    def train_bert_layers(cls):
+    def bert_multilang(cls):
         tokenizer_desc = AutoTokenizer.from_pretrained("bert-base-multilingual-uncased")
         model_desc = AutoModel.from_pretrained("bert-base-multilingual-uncased")
         tokenizer_title = AutoTokenizer.from_pretrained("distilbert-base-uncased")
@@ -56,21 +56,7 @@ class PytorchTransformerConfig:
         epochs = 4
 
         return PytorchTransformerConfig(tokenizer_title, tokenizer_desc, model_title, model_desc, max_len_title,
-                                        max_len_desc, batch_size, epochs, name="TrainBertLayers", freeze_bert=False)
-
-    @classmethod
-    def xlm_model(cls):
-        tokenizer_desc = AutoTokenizer.from_pretrained("xlm-roberta-base")
-        model_desc = AutoModel.from_pretrained("xlm-roberta-base")
-        tokenizer_title = AutoTokenizer.from_pretrained("distilbert-base-cased")
-        model_title = AutoModel.from_pretrained("distilbert-base-cased")
-        max_len_title = 75
-        max_len_desc = 300
-        batch_size = 32
-        epochs = 20
-
-        return PytorchTransformerConfig(tokenizer_title, tokenizer_desc, model_title, model_desc, max_len_title,
-                                        max_len_desc, batch_size, epochs, name="XLMModel")
+                                        max_len_desc, batch_size, epochs, name="TrainBertLayers", freeze_pretrained_layers=False)
 
     @classmethod
     def description_only(cls):

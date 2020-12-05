@@ -9,16 +9,16 @@ from pytorch_lightning.loggers import WandbLogger
 
 from src.classifier.PytorchTransformer.data_processing.BertDataSet import BertDataSet
 from src.classifier.PytorchTransformer.PyTorchLighningTransformer import PyTorchTransformerLightning
-from src.classifier.PytorchTransformer.config.PytorchTransformerConfig import PytorchTransformerConfig
-from src.classifier.interfaces.MLModelInterface import MlModelInterface
+from src.classifier.PytorchTransformer.config.TransformerModelConfig import PytorchTransformerConfig
+from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 from src.entity.Tender import Tender
 
 
-class FullTextTransformerModel(MlModelInterface):
+class FullTextTransformerModel(TenderClassClassifier):
 
     def __init__(self):
-        self.config: PytorchTransformerConfig = PytorchTransformerConfig.train_bert_layers()
+        self.config: PytorchTransformerConfig = PytorchTransformerConfig.bert_multilang()
         self.model: PyTorchTransformerLightning = self.create_new_model()
 
     def classify(self, tenders: List[Tender]):

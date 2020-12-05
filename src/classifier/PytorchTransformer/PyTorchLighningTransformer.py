@@ -3,23 +3,23 @@ import torch.nn as nn
 from pytorch_lightning import LightningModule
 from transformers import AdamW, get_linear_schedule_with_warmup
 
-from src.classifier.PytorchTransformer.config import PytorchTransformerConfig
+from src.classifier.PytorchTransformer.config import TransformerModelConfig
 
 
 class PyTorchTransformerLightning(LightningModule):
 
-    def __init__(self, config: PytorchTransformerConfig, total_steps=0):
+    def __init__(self, config: TransformerModelConfig, total_steps=0):
         super(PyTorchTransformerLightning, self).__init__()
 
         self.config = config
 
-        # Specify hidden size of BERT, hidden size of our classifier, and number of labels
+        # Specify number of input feature, size of hidden state and number of output features
         D_in, H, D_out = 768, 50, 2
 
         self.loss_fn = torch.nn.CrossEntropyLoss()
         self.total_steps = total_steps
 
-        # Instantiate BERT model
+        # Instantiate pretrained model
         self.model_title = config.model_title if config.model_title is not None else self.empty_model
         self.model_desc = config.model_desc if config.model_desc is not None else self.empty_model
 
@@ -32,7 +32,7 @@ class PyTorchTransformerLightning(LightningModule):
         )
 
         # Freeze the BERT model
-        if config.freeze_bert:
+        if config.freeze_pretrained_layers:
             if config.model_title is not None:
                 for param in self.model_title.parameters():
                     param.requires_grad = False
@@ -70,7 +70,6 @@ class PyTorchTransformerLightning(LightningModule):
         else:
             output = torch.cat((outputs_titles[0][:, 0, :], outputs_descs[0][:, 0, :]), dim=1)
 
-        # Feed input to classifier to compute logits
         logits = self.classifier(output)
 
         return logits
@@ -81,17 +80,14 @@ class PyTorchTransformerLightning(LightningModule):
         description_input_ids = batch["description_input_ids"]
         description_attention_masks = batch["description_attention_mask"]
         labels = batch["label"]
-        # Perform a forward pass. This will return logits.
+
         logits = self.forward(title_input_ids, title_attention_masks, description_input_ids,
                               description_attention_masks)
 
-        # identifying number of correct predections in a given batch
         correct = logits.argmax(dim=1).eq(labels).sum().item()
 
-        # identifying total number of labels in a given batch
         total = len(labels)
 
-        # Compute loss and accumulate the loss values
         loss = self.loss_fn(logits, labels)
         logs = {'train_loss': loss}
 
@@ -110,14 +106,11 @@ class PyTorchTransformerLightning(LightningModule):
         description_attention_masks = batch["description_attention_mask"]
         labels = batch["label"]
 
-        # Perform a forward pass. This will return logits.
         logits = self.forward(title_input_ids, title_attention_masks, description_input_ids,
                               description_attention_masks)
 
-        # Compute loss and accumulate the loss values
         loss = self.loss_fn(logits, labels)
 
-        # Compute the accuracy
         preds = torch.argmax(logits, dim=1).flatten()
         accuracy = torch.tensor((preds == labels).cpu().numpy().mean() * 100)
 

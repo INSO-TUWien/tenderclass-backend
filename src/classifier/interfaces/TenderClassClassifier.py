@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class MlModelInterface(ABC):
+class TenderClassClassifier(ABC):
 
     @abstractmethod
     def create_new_model(self):

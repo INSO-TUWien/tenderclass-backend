@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import Dataset
 
 from src.classifier.PytorchTransformer.data_processing.BertPreprocessor import BertPreprocessor
-from src.classifier.PytorchTransformer.config.PytorchTransformerConfig import PytorchTransformerConfig
+from src.classifier.PytorchTransformer.config.TransformerModelConfig import PytorchTransformerConfig
 
 
 class BertDataSet(Dataset):

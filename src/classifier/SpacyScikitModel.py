@@ -10,7 +10,7 @@ import spacy
 import string
 import logging
 
-from src.classifier.interfaces.MLModelInterface import MlModelInterface
+from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ MODEL_NAME = "scikit_model"
 punctuations = string.punctuation
 
 
-class SpacyScikitModel(MlModelInterface):
+class SpacyScikitModel(TenderClassClassifier):
 
     def __init__(self):
         if LANGUAGE == "DE":

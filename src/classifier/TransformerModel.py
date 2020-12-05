@@ -6,7 +6,7 @@ import time
 
 from sklearn.model_selection import train_test_split
 
-from src.classifier.interfaces.MLModelInterface import MlModelInterface
+from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -19,7 +19,7 @@ args = {
 
 cuda_available = torch.cuda.is_available()
 
-class TransformerModel(MlModelInterface):
+class TransformerModel(TenderClassClassifier):
     """
     This class provides the Machine Learning model and classifies tenders based on previous training data.
     """

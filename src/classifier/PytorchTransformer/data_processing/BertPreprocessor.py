@@ -2,7 +2,7 @@ import string
 
 import torch
 
-from src.classifier.PytorchTransformer.config.PytorchTransformerConfig import PytorchTransformerConfig
+from src.classifier.PytorchTransformer.config.TransformerModelConfig import PytorchTransformerConfig
 from src.entity.Tender import Tender
 
 

@@ -1,3 +1,4 @@
+from classifier.TransformerModel import TransformerModel
 from src.classifier.FullTextTransformerModel import FullTextTransformerModel
 from src.classifier.SpacyScikitModel import SpacyScikitModel
 from src.persistence.Persistence import Persistence
@@ -6,7 +7,7 @@ from src.service.Trainer import Trainer
 
 
 # TODO: select the Machine Learning model
-tender_model = FullTextTransformerModel()
+tender_model = SpacyScikitModel()
 # tender_model = TransformerModel()
 
 tender_recommender = Recommender(tender_model)

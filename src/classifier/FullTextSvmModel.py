@@ -15,12 +15,12 @@ from spacy.lang.en import English
 import string
 from nltk.stem import WordNetLemmatizer
 
-from src.classifier.interfaces.MLModelInterface import MlModelInterface
+from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 
 punctuations = string.punctuation
 
-class FullTextSvmModel(MlModelInterface):
+class FullTextSvmModel(TenderClassClassifier):
 
     def __init__(self):
         nltk.download('punkt')
