@@ -1,9 +1,12 @@
 # tuwien-inso-bachelorthesis-tenderclass-backend
 
-tenderclass is an automated screening system for public procurement notices using state-of-the-art Machine Learning and Natural Language Processing (NLP) frameworks. This git repository holds the Python-based backend of tenderclass. It is responsible for downloading, parsing and classifying tenders from Tenders Electronic Daily (TED). For this reason, this prototype implements two Machine Learning approaches:
+tenderclass is an automated screening system for public procurement notices using state-of-the-art Machine Learning and Natural Language Processing (NLP) frameworks. This git repository holds the Python-based backend of tenderclass. It is responsible for downloading, parsing and classifying tenders from Tenders Electronic Daily (TED). For this reason, this prototype implements following Machine Learning approaches:
 
-- SpacyScikitModel: Machine Learning Model based on [spaCy](https://spacy.io/) and [scikit-learn](https://scikit-learn.org/stable/)
-- TransformerModel: Machine Learning Model based on [Hugging Face](https://github.com/huggingface/transformers) and [simpletransformers](https://github.com/ThilinaRajapakse/simpletransformers)
+- SpacyScikitModel: Machine Learning Model based on [spaCy](https://spacy.io/) and [scikit-learn](https://scikit-learn.org/stable/) (titles only)
+- TransformerModel: Machine Learning Model based on [Hugging Face](https://github.com/huggingface/transformers) and [simpletransformers](https://github.com/ThilinaRajapakse/simpletransformers) (titles only)
+- FullTextSvmModel: Machine Learning Model based on [spaCy](https://spacy.io/) and [scikit-learn](https://scikit-learn.org/stable/)
+- FastTextModel: Machine Leanring Model based on [FastText](https://fasttext.cc/)
+- FullTextTransformerModel: Machine Learning Model based on [Hugging Face](https://github.com/huggingface/transformers) and [PyTorch](https://pytorch.org/) with [PytorchLightning](https://www.pytorchlightning.ai/)
 
 ## Getting Started
 
@@ -14,7 +17,7 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 - [Python 3.7/3.8](https://www.python.org/downloads/)
-- OPTIONAL: If you want to train the TransformerModel on a Nvidia GPU (much faster!): [CUDA Toolkit 10.2](https://developer.nvidia.com/cuda-downloads)
+- OPTIONAL: Some models can be trained on a Nvidia GPU (much faster!): [CUDA Toolkit 10.2](https://developer.nvidia.com/cuda-downloads)
 - OPTIONAL: If you want to deploy it as a Docker container: [Docker](https://www.docker.com/) runtime environment
 
 ### Installing
@@ -108,9 +111,21 @@ This endpoint updates the model with additional labeled training data. As the us
 Although there is no designated endpoint for fetching specific, query-based tenders, each core function requires downloading, parsing and extracting tenders which the Fetcher module is responsible for. This is why this subsection explains in detail the communication flow of fetching a tender, as seen in the following figure. As soon as the Fetcher module gets a request, it immediately delegates the request to the TedFetcher. In defiance of this extra delegation, this pattern allows developers to add additional data sources such as national public procurement platforms. As TED API supports pagination with up to 100 tender documents per API call, the TedFetcher needs to enter a loop. In each iteration, it calls get_xml_contracts with i as the page number. Subsequently, the triggered TedDownloader issues a REST call to the TED API as described in the Fetch Tender section. Once it has parsed the response and returned the list of XML documents of the i-th page, the TedFetcher module calls the extract method from the TedExtractor. This second step instantiates and initializes a new Tender entity by extracting CPV code, id, title and description out of the XML document. As soon as the component either reaches the requested number c of tenders or exceeds the maximum number of pages (which implies that fewer tenders than intended are returned), the module returns the list of Tender entities.
 ![Fetch models](doc/get.png)
 
+## Logging
+The FullTextTransformer model has support for wandb to log statistics of a training run of the model. The logs can be accessed on the [Weights & Biases (wandb) portal](https://wandb.ai/home). 
+
+To write logs to the platform, the user has to be logged in. Provided the the corresponding `wandb package has been istalled via pip, which is the case
+if all requirements have been installed, the user ca login via following command:
+
+`wandb login`
+
+No the logged metrics of runs of the FullTextTransformerModel can be viewed on the wandb-acocunt associated with the used
+credentials on [https://www.wandb.com/](https://www.wandb.com/).
+
 ## Authors
 
 * **Nicolas Griebenow** - *Initial work* - [ngriebenow](https://github.com/ngriebenow)
+* **Lukas Arnhold** - *Further development of classification models* - [larnhold](https://github.com/larnhold)
 
 
 
