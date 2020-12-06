@@ -11,9 +11,9 @@ import logging
 sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 
 # import routes
-from src.routes.v2.model import model_blueprint
-from src.routes.v2.persistence import persistence_blueprint
-from src.routes.v2.web import web_blueprint
+from src.routes.v1.model import model_blueprint
+from src.routes.v1.persistence import persistence_blueprint
+from src.routes.v1.web import web_blueprint
 
 # set up logging
 logger = logging.getLogger(__name__)
@@ -25,9 +25,9 @@ logger.info("start tenderclass-backend")
 
 #setup routes
 app = Flask(__name__)
-app.register_blueprint(model_blueprint, url_prefix="/api/v2/model")
-app.register_blueprint(web_blueprint, url_prefix="/api/v2/web")
-app.register_blueprint(persistence_blueprint, url_prefix="/api/v2/persistence")
+app.register_blueprint(model_blueprint, url_prefix="/api/v1/model")
+app.register_blueprint(web_blueprint, url_prefix="/api/v1/web")
+app.register_blueprint(persistence_blueprint, url_prefix="/api/v1/persistence")
 CORS(app)
 
 # set up Swagger documentation
