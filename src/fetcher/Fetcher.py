@@ -13,6 +13,6 @@ class Fetcher:
     def __init__(self):
         self.ted_fetcher = TedFetcher()
 
-    def get(self, count: int, load_documents: bool = False, search_criteria: str = "", languages: List[str] = ["DE", "EN"], page_offset: int = 0) -> List[Tender]:
+    def get(self, count: int, load_documents: bool = False, search_criteria: str = "", languages: List[str] = ["DE", "EN", "FR", "IT", "ES", "PL"], page_offset: int = 0) -> List[Tender]:
         return self.ted_fetcher.get(count, load_documents, search_criteria, languages, page_offset)
 

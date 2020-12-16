@@ -45,12 +45,12 @@ class PytorchTransformerConfig:
                                         max_len_desc, batch_size, epochs, name="StandardModel")
 
     @classmethod
-    def bert_multilang(cls):
-        tokenizer_desc = AutoTokenizer.from_pretrained("bert-base-multilingual-uncased")
-        model_desc = AutoModel.from_pretrained("bert-base-multilingual-uncased")
-        tokenizer_title = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-        model_title = AutoModel.from_pretrained("distilbert-base-uncased")
-        max_len_title = 75
+    def bert_german(cls):
+        tokenizer_desc = AutoTokenizer.from_pretrained("bert-base-german-cased")
+        model_desc = AutoModel.from_pretrained("bert-base-german-cased")
+        tokenizer_title = AutoTokenizer.from_pretrained("bert-base-german-cased")
+        model_title = AutoModel.from_pretrained("bert-base-german-cased")
+        max_len_title = 40
         max_len_desc = 300
         batch_size = 32
         epochs = 4

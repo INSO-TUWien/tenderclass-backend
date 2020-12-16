@@ -1,17 +1,17 @@
-import re
+import logging
 
 import nltk
 import pandas as pd
 from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split, cross_val_score
 import spacy
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.svm import LinearSVC, SVC
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
-from spacy.lang.en.stop_words import STOP_WORDS
-from spacy.lang.en import English
+from spacy.lang.de import German
+from spacy.lang.de.stop_words import STOP_WORDS
 import string
 from nltk.stem import WordNetLemmatizer
 
@@ -20,15 +20,19 @@ from src.entity.LabeledTenderCollection import LabelledTenderCollection
 
 punctuations = string.punctuation
 
+logger = logging.getLogger(__name__)
+
 class FullTextSvmModel(TenderClassClassifier):
 
     def __init__(self):
         nltk.download('punkt')
         nltk.download('wordnet')
         self.stopwords = list(STOP_WORDS)
-        self.nlp = spacy.load("en")
+        self.domain_stopwords = ["Ausschreibung", "Bekanntmachung"]
+        self.stopwords.extend(self.domain_stopwords)
+        self.nlp = spacy.load("de")
         self.lemma = WordNetLemmatizer()
-        self.parser = English()
+        self.parser = German()
         self.stemmer = nltk.PorterStemmer()
         self.punctuations = string.punctuation
         self.domain_stopwords = ["contract", "system", "service", "tender", "company", "notice", "procurement",
@@ -63,7 +67,7 @@ class FullTextSvmModel(TenderClassClassifier):
             return {}
 
     def classify(self, tenders):
-        titles = list(map(lambda x: x.get_title("EN"), tenders))
+        titles = list(map(lambda x: x.get_title("DE"), tenders))
         predictions = self.model.predict(titles)
         tuples = zip(tenders, predictions)
         selected_tenders = [t for t, p in tuples if p == 1]
@@ -73,7 +77,7 @@ class FullTextSvmModel(TenderClassClassifier):
         labelled_tenders_collection = LabelledTenderCollection(labelled_tenders)
 
         #create the pandas df
-        training_df = pd.DataFrame({"titles": labelled_tenders_collection.get_titles(), "descriptions": labelled_tenders_collection.get_descriptions(), "label": labelled_tenders_collection.get_labels()})
+        training_df = pd.DataFrame({"titles": labelled_tenders_collection.get_titles("DE"), "descriptions": labelled_tenders_collection.get_descriptions("DE"), "label": labelled_tenders_collection.get_labels()})
         # remove null values (description is not alway set)
         training_df = training_df
         X = training_df['titles']
@@ -169,6 +173,10 @@ class FullTextSvmModel(TenderClassClassifier):
         y_pred2 = self.model.predict(X_test2)
         print("Newest Score:")
         print(accuracy_score(y_test2, y_pred2))
+
+        tn, fp, fn, tp = confusion_matrix(y_test2, y_pred2).ravel()
+        logger.info(f"tn: {tn} fp: {fp}")
+        logger.info(f"fn: {fn} tp:{tp}")
 
     def create_new_model(self):
         pass
