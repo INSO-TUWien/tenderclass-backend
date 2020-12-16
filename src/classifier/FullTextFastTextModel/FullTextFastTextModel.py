@@ -14,7 +14,7 @@ import spacy
 from sklearn.model_selection import train_test_split
 from spacy.lang.de import German
 
-from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
+from classifier.TenderClassClassifier import TenderClassClassifier
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 from src.entity.Tender import Tender
 

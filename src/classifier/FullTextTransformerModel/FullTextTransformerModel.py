@@ -7,10 +7,10 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from pytorch_lightning.loggers import WandbLogger
 
-from src.classifier.PytorchTransformer.data_processing.BertDataSet import BertDataSet
-from src.classifier.PytorchTransformer.PyTorchLighningTransformer import PyTorchTransformerLightning
-from src.classifier.PytorchTransformer.config.TransformerModelConfig import PytorchTransformerConfig
-from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
+from classifier.FullTextTransformerModel.PytorchTransformer import BertDataSet
+from classifier.FullTextTransformerModel.PytorchTransformer import PyTorchTransformerLightning
+from classifier.FullTextTransformerModel.PytorchTransformer.config import PytorchTransformerConfig
+from classifier.TenderClassClassifier import TenderClassClassifier
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 from src.entity.Tender import Tender
 

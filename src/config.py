@@ -1,3 +1,5 @@
+from classifier.FullTextFastTextModel import FullTextFastTextModel
+from classifier.FullTextSvmModel import FullTextSvmModel
 from classifier.TransformerModel import TransformerModel
 from src.classifier.FullTextTransformerModel import FullTextTransformerModel
 from src.classifier.SpacyScikitModel import SpacyScikitModel

@@ -15,7 +15,7 @@ from spacy.lang.de.stop_words import STOP_WORDS
 import string
 from nltk.stem import WordNetLemmatizer
 
-from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
+from classifier.TenderClassClassifier import TenderClassClassifier
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 
 punctuations = string.punctuation

@@ -6,7 +6,7 @@ import time
 
 from sklearn.model_selection import train_test_split
 
-from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
+from classifier.TenderClassClassifier import TenderClassClassifier
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

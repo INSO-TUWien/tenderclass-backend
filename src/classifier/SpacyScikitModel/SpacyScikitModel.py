@@ -10,7 +10,7 @@ import spacy
 import string
 import logging
 
-from src.classifier.interfaces.TenderClassClassifier import TenderClassClassifier
+from classifier.TenderClassClassifier import TenderClassClassifier
 
 logger = logging.getLogger(__name__)
 
