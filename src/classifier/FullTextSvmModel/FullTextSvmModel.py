@@ -2,14 +2,13 @@ import logging
 
 import nltk
 import pandas as pd
-from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import train_test_split
 import spacy
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.svm import LinearSVC, SVC
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
+from sklearn.svm import SVC
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from spacy.lang.de import German
 from spacy.lang.de.stop_words import STOP_WORDS
 import string
@@ -80,63 +79,10 @@ class FullTextSvmModel(TenderClassClassifier):
         training_df = pd.DataFrame({"titles": labelled_tenders_collection.get_titles("DE"), "descriptions": labelled_tenders_collection.get_descriptions("DE"), "label": labelled_tenders_collection.get_labels()})
         # remove null values (description is not alway set)
         training_df = training_df
-        X = training_df['titles']
+        training_df.loc[training_df["descriptions"].isnull(), 'descriptions'] = training_df["titles"]
+        X = training_df[['titles', 'descriptions']]
         ylabels = training_df['label']
         X_train, X_test, y_train, y_test = train_test_split(X, ylabels, test_size=0.1, random_state=0)
-
-        training_df2 = training_df
-        training_df2.loc[training_df2["descriptions"].isnull(), 'descriptions'] = training_df2["titles"]
-        X2 = training_df[['titles', 'descriptions']]
-
-        ylabels2 = training_df['label']
-        X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, ylabels2, test_size=0.1, random_state=0)
-
-        # start with the classic
-        # with either pure counts or tfidf features
-        sgd = Pipeline([
-            ("count vectorizer", CountVectorizer(stop_words="english", max_features=3000)),
-            ("sgd", SGDClassifier(loss="modified_huber"))
-        ])
-        sgd_tfidf = Pipeline([
-            ("tfidf_vectorizer", TfidfVectorizer(stop_words="english", max_features=3000)),
-            ("sgd", SGDClassifier(loss="modified_huber"))
-        ])
-
-        svc = Pipeline([
-            ("count_vectorizer", CountVectorizer(stop_words="english", max_features=3000)),
-            ("linear svc", SVC(kernel="linear"))
-        ])
-
-        svc_tfidf = Pipeline([
-            ("tfidf_vectorizer", TfidfVectorizer(stop_words="english", max_features=3000)),
-            ("linear svc", SVC(kernel="linear", random_state=0))
-        ])
-
-        all_models = [
-            ("sgd", sgd),
-            ("sgd_tfidf", sgd_tfidf),
-            ("svc", svc),
-            ("svc_tfidf", svc_tfidf),
-        ]
-
-        print(X_train.shape)
-
-        unsorted_scores = [(name, cross_val_score(model, X_train, y_train, cv=2).mean()) for name, model in all_models]
-        scores = sorted(unsorted_scores, key=lambda x: -x[1])
-        print(scores)
-        #svc performs best
-
-        old = Pipeline([("cleaner", self.Predictors()),
-                  ('vectorizer', CountVectorizer(tokenizer=self.spacy_tokenizer, ngram_range=(1, 2))),
-                  ('classifier', LinearSVC())])
-
-        model = old
-        model.fit(X_train, y_train)
-        y_pred = model.predict(X_test)
-        print("Old Score:")
-        print(accuracy_score(y_test, y_pred))
-
-        ###########NEW
 
         class Ectractor(BaseEstimator, TransformerMixin):
 
@@ -155,12 +101,12 @@ class FullTextSvmModel(TenderClassClassifier):
                 transformer_list=[
                     ('titles', Pipeline([
                         ('selector', Ectractor(column="titles")),
-                        ('vect', CountVectorizer( max_features=1000, tokenizer=self.spacy_tokenizer, ngram_range=(1, 2))),
+                        ('vect', CountVectorizer(max_features=1000, tokenizer=self.spacy_tokenizer, ngram_range=(1, 2))),
                         ('tfidf', TfidfTransformer())
                     ])),
                     ('descriptions', Pipeline([
                         ('selector', Ectractor(column="descriptions")),
-                        ('vect', CountVectorizer( max_features=1000, tokenizer=self.spacy_tokenizer, ngram_range=(1, 2))),
+                        ('vect', CountVectorizer(max_features=1000, tokenizer=self.spacy_tokenizer, ngram_range=(1, 2))),
                         ('tfidf', TfidfTransformer())
                     ])),
                 ],
@@ -169,12 +115,12 @@ class FullTextSvmModel(TenderClassClassifier):
         ])
 
         self.model = pipeline
-        self.model.fit(X_train2, y_train2)
-        y_pred2 = self.model.predict(X_test2)
+        self.model.fit(X_train, y_train)
+        y_pred = self.model.predict(X_test)
         print("Newest Score:")
-        print(accuracy_score(y_test2, y_pred2))
+        print(accuracy_score(y_test, y_pred))
 
-        tn, fp, fn, tp = confusion_matrix(y_test2, y_pred2).ravel()
+        tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
         logger.info(f"tn: {tn} fp: {fp}")
         logger.info(f"fn: {fn} tp:{tp}")
 
