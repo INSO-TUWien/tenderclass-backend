@@ -7,9 +7,11 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from pytorch_lightning.loggers import WandbLogger
 
-from classifier.FullTextTransformerModel.PytorchTransformer import BertDataSet
-from classifier.FullTextTransformerModel.PytorchTransformer import PyTorchTransformerLightning
-from classifier.FullTextTransformerModel.PytorchTransformer.config import PytorchTransformerConfig
+from classifier.FullTextTransformerModel.PytorchTransformer.PyTorchLighningTransformer import \
+    PyTorchTransformerLightning
+from classifier.FullTextTransformerModel.PytorchTransformer.config.TransformerModelConfig import \
+    PytorchTransformerConfig
+from classifier.FullTextTransformerModel.PytorchTransformer.data_processing.BertDataSet import BertDataSet
 from classifier.TenderClassClassifier import TenderClassClassifier
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 from src.entity.Tender import Tender
@@ -18,7 +20,7 @@ from src.entity.Tender import Tender
 class FullTextTransformerModel(TenderClassClassifier):
 
     def __init__(self):
-        self.config: PytorchTransformerConfig = PytorchTransformerConfig.bert_multilang()
+        self.config: PytorchTransformerConfig = PytorchTransformerConfig.bert_german()
         self.model: PyTorchTransformerLightning = self.create_new_model()
 
     def classify(self, tenders: List[Tender]):
