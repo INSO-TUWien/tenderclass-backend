@@ -29,16 +29,18 @@ class FullTextTransformerModel(TenderClassClassifier):
         data = BertDataSet(df, self.config)
         dataloader = DataLoader(data, batch_size=1)
         predictions = []
+        self.model.eval()
 
-        for batch_ndx, sample in enumerate(dataloader):
-            title_input_ids = sample["title_input_ids"]
-            title_attention_masks = sample["title_attention_mask"]
-            description_input_ids = sample["description_input_ids"]
-            description_attention_masks = sample["description_attention_mask"]
-            logits = self.model(title_input_ids, title_attention_masks, description_input_ids,
-                                description_attention_masks)
-            _, predicted = torch.max(logits, 1)
-            predictions.append(predicted.data[0].item())
+        with torch.no_grad():
+            for batch_ndx, sample in enumerate(dataloader):
+                title_input_ids = sample["title_input_ids"]
+                title_attention_masks = sample["title_attention_mask"]
+                description_input_ids = sample["description_input_ids"]
+                description_attention_masks = sample["description_attention_mask"]
+                logits = self.model(title_input_ids, title_attention_masks, description_input_ids,
+                                    description_attention_masks)
+                _, predicted = torch.max(logits, 1)
+                predictions.append(predicted.data[0].item())
 
         return predictions
 
