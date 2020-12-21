@@ -6,15 +6,12 @@ from typing import List
 import pandas as pd
 import fasttext.util
 from sklearn import svm
-from sklearn import metrics
-from sklearn.metrics import confusion_matrix
 from spacy.lang.de.stop_words import STOP_WORDS
-import spacy
 
-from sklearn.model_selection import train_test_split
 from spacy.lang.de import German
 
 from classifier.TenderClassClassifier import TenderClassClassifier
+from entity.ValidationResult import ValidationResult
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 from src.entity.Tender import Tender
 
@@ -25,13 +22,23 @@ logger = logging.getLogger(__name__)
 class FullTextFastTextModel(TenderClassClassifier):
 
     def __init__(self):
-        self.nlp = spacy.load('de_core_news_sm')
         self.domain_stopwords = ["Ausschreibung", "Bekanntmachung"]
         self.parser = German()
         self.stopwords = list(STOP_WORDS)
         self.stopwords.extend(self.domain_stopwords)
-        # fasttext.util.download_model('de', if_exists='ignore')
-        # self.create_new_model()
+        self.fast_text_model = None
+        self.svm_average_model = None
+        self.create_new_model()
+
+    def predict(self, df):
+        val_svm = pd.DataFrame({
+            "title_pos_prob": [self.extract_pos_probability(self.fast_text_model.predict(x)) for x in
+                               df["title"].values.tolist()],
+            "desc_pos_prob": [self.extract_pos_probability(self.fast_text_model.predict(x)) for x in
+                              df["description"].values.tolist()]
+        })
+
+        return self.svm_average_model.predict(val_svm[["title_pos_prob", "desc_pos_prob"]])
 
     def classify(self, tenders: List[Tender]):
         pass
@@ -43,20 +50,11 @@ class FullTextFastTextModel(TenderClassClassifier):
         sentence_tokens = [word for word in sentence_tokens if word not in self.stopwords and word not in punctuations]
         return sentence_tokens
 
-    def save_dataset(self, dataset, name):
-        dataset.to_csv(name,
-                       index=False,
-                       sep=" ",
-                       header=None,
-                       quoting=csv.QUOTE_NONE,
-                       quotechar="",
-                       escapechar=" ")
-
-    def train(self, labelled_tenders):
+    def prepare_data(self, labelled_tenders):
         labelled_tenders_collection = LabelledTenderCollection(labelled_tenders)
 
-        complete_df = pd.DataFrame({"title": labelled_tenders_collection.get_titles(),
-                                    "description": labelled_tenders_collection.get_original_language_entity_description(),
+        complete_df = pd.DataFrame({"title": labelled_tenders_collection.get_titles("DE"),
+                                    "description": labelled_tenders_collection.get_descriptions("DE"),
                                     "label": labelled_tenders_collection.get_labels()})
         complete_df = complete_df.dropna()
 
@@ -69,47 +67,53 @@ class FullTextFastTextModel(TenderClassClassifier):
         logger.info("Prefixing")
         complete_df.iloc[:, 2] = complete_df.iloc[:, 2].apply(lambda x: "__label__" + str(x))
 
-        # train / test split
-        train_df, val_df = train_test_split(complete_df, test_size=0.1)
+        return complete_df
 
-        self.save_dataset(train_df[["title", "label"]], "title_train.csv")
-        self.save_dataset(val_df[["title", "label"]], "title_val.csv")
+    def save_dataset(self, dataset, name):
+        dataset.to_csv(name,
+                       index=False,
+                       sep=" ",
+                       header=None,
+                       quoting=csv.QUOTE_NONE,
+                       quotechar="",
+                       escapechar=" ")
 
-        self.save_dataset(train_df[["description", "label"]], "desc_train.csv")
-        self.save_dataset(val_df[["description", "label"]], "desc_val.csv")
+    def train(self, labelled_tenders):
+        complete_df = self.prepare_data(labelled_tenders)
+
+        title_df = complete_df[["title", "label"]]
+        title_df.columns = ['value', 'label']
+
+        desc_df = complete_df[["description", "label"]]
+        desc_df.columns = ['value', 'label']
+
+        fasttext_training_df = pd.concat([title_df, desc_df])
+
+        self.save_dataset(fasttext_training_df, "fasttext_train.csv")
 
         logger.info("Training model")
-        model_title = fasttext.train_supervised("title_train.csv", wordNgrams=2)
-        model_desc = fasttext.train_supervised("desc_train.csv", wordNgrams=2)
-        logger.info("Title acc.: " + str(model_title.test("title_val.csv")))
-        logger.info("Description acc.: " + str(model_desc.test("desc_val.csv")))
+        self.fast_text_model = fasttext.train_supervised("fasttext_train.csv", wordNgrams=2)
 
         # train the linear classifier
         svm_train = pd.DataFrame({
-            "title_pos_prob": [self.extract_pos_probability(model_title.predict(x)) for x in train_df["title"].values.tolist()],
-            "desc_pos_prob": [self.extract_pos_probability(model_desc.predict(x)) for x in train_df["description"].values.tolist()],
-            "label": [0 if x == "__label__0" else 1 for x in train_df["label"].values.tolist()]
+            "title_pos_prob": [self.extract_pos_probability(self.fast_text_model.predict(x)) for x in
+                               complete_df["title"].values.tolist()],
+            "desc_pos_prob": [self.extract_pos_probability(self.fast_text_model.predict(x)) for x in
+                              complete_df["description"].values.tolist()],
+            "label": [0 if x == "__label__0" else 1 for x in complete_df["label"].values.tolist()]
         })
 
-        X_train, y_train = (svm_train[["title_pos_prob", "desc_pos_prob"]], svm_train["label"])
+        X, y = (svm_train[["title_pos_prob", "desc_pos_prob"]], svm_train["label"])
 
-        clf = svm.SVC(kernel='linear')
-        clf.fit(X_train, y_train)
+        self.svm_average_model = svm.SVC(kernel='linear')
+        self.svm_average_model.fit(X, y)
 
-        # validation
-        # train the linear classifier
-        val_svm = pd.DataFrame({
-            "title_pos_prob": [self.extract_pos_probability(model_title.predict(x)) for x in val_df["title"].values.tolist()],
-            "desc_pos_prob": [self.extract_pos_probability(model_desc.predict(x)) for x in val_df["description"].values.tolist()],
-            "label": [0 if x == "__label__0" else 1 for x in val_df["label"].values.tolist()]
-        })
+    def validate(self, labelled_tenders):
+        complete_df = self.prepare_data(labelled_tenders)
+        y_pred = self.predict(complete_df)
+        y_labels = [0 if x == "__label__0" else 1 for x in complete_df["label"].values.tolist()]
 
-        y_pred = clf.predict(val_svm[["title_pos_prob", "desc_pos_prob"]])
-        logger.info("Accuracy:", metrics.accuracy_score(val_svm["label"], y_pred))
-
-        tn, fp, fn, tp = confusion_matrix(val_svm["label"], y_pred).ravel()
-        logger.info(f"tn: {tn} fp: {fp}")
-        logger.info(f"fn: {fn} tp:{tp}")
+        return ValidationResult(y_labels, y_pred)
 
     def extract_pos_probability(self, fast_text_prediction):
         (label, probability) = fast_text_prediction
@@ -122,5 +126,5 @@ class FullTextFastTextModel(TenderClassClassifier):
         pass
 
     def create_new_model(self):
-        # self.model = fasttext.load_model('cc.en.300.bin')
-        pass
+        self.fast_text_model = None
+        self.svm_average_model = None

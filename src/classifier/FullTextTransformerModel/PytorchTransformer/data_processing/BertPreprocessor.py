@@ -2,7 +2,7 @@ import string
 
 import torch
 
-from classifier.FullTextTransformerModel.PytorchTransformer.config.TransformerModelConfig import \
+from classifier.FullTextTransformerModel.config.TransformerModelConfig import \
     PytorchTransformerConfig
 from src.entity.Tender import Tender
 

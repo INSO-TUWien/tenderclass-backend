@@ -3,7 +3,7 @@ import torch.nn as nn
 from pytorch_lightning import LightningModule
 from transformers import AdamW, get_linear_schedule_with_warmup
 
-from classifier.FullTextTransformerModel.PytorchTransformer.config import TransformerModelConfig
+from classifier.FullTextTransformerModel.config import TransformerModelConfig
 
 
 class PyTorchTransformerLightning(LightningModule):
