@@ -96,7 +96,4 @@ class FullTextTransformerModel(TenderClassClassifier):
         if len(args) is 1:
             self.config = args[0]
 
-        del self.model
-        torch.cuda.empty_cache()
-
         self.model = PyTorchTransformerLightning(self.config)

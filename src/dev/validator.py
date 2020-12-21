@@ -6,6 +6,8 @@ import sys
 import time
 
 # Use src path so that the python interpreter can access all modules
+import torch
+
 sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 
 from sklearn.model_selection import KFold
@@ -57,7 +59,8 @@ class Validator:
                 impl.create_new_model()
                 impl.train([labelled_tenders[i] for i in train])
                 self.write_result(name, iteration, impl.validate([labelled_tenders[i] for i in test]))
-                pass
+                del impl
+                torch.cuda.empty_cache()
 
             #break
 
