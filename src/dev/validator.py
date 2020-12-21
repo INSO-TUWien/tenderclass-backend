@@ -4,6 +4,7 @@ import random
 import csv
 import sys
 import time
+import gc
 
 # Use src path so that the python interpreter can access all modules
 import torch
@@ -23,12 +24,12 @@ from src.classifier.FullTextTransformerModel.config.TransformerModelConfig impor
 from src.entity.Tender import Tender
 
 models = {
-    "FullTextFastTextModel": FullTextFastTextModel(),
-    "FullTextFastTextModelTitleOnly": FullTextFastTextModelTitleOnly(),
-    "FullTextFastTextModelDescOnly": FullTextFastTextModelDescOnly(),
     "FullTextTransformerModel": FullTextTransformerModel(PytorchTransformerConfig.bert_german_full()),
     "FullTextTransformerModelTitleOnly": FullTextTransformerModel(PytorchTransformerConfig.bert_german_title_only()),
     "FullTextTransformerModelDescOnly": FullTextTransformerModel(PytorchTransformerConfig.bert_german_description_only()),
+    "FullTextFastTextModel": FullTextFastTextModel(),
+    "FullTextFastTextModelTitleOnly": FullTextFastTextModelTitleOnly(),
+    "FullTextFastTextModelDescOnly": FullTextFastTextModelDescOnly(),
     "FullTextSvmModel": FullTextSvmModel(),
     "FullTextSvmModelTitleOnly": FullTextSvmModelTitleOnly(),
     "FullTextSvmModelDescOnly": FullTextSvmModelDescOnly(),
@@ -59,8 +60,8 @@ class Validator:
                 impl.create_new_model()
                 impl.train([labelled_tenders[i] for i in train])
                 self.write_result(name, iteration, impl.validate([labelled_tenders[i] for i in test]))
-                del impl
                 torch.cuda.empty_cache()
+                gc.collect()
 
             #break
 
