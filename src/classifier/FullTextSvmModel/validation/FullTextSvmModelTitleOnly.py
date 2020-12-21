@@ -1,7 +1,6 @@
 import logging
 
 import pandas as pd
-from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, f1_score
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.svm import SVC
@@ -10,8 +9,8 @@ from spacy.lang.de import German
 from spacy.lang.de.stop_words import STOP_WORDS
 import string
 
-from classifier.TenderClassClassifier import TenderClassClassifier
-from entity.ValidationResult import ValidationResult
+from src.classifier.TenderClassClassifier import TenderClassClassifier
+from src.entity.ValidationResult import ValidationResult
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 
 punctuations = string.punctuation

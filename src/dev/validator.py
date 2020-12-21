@@ -1,19 +1,24 @@
 import json
+import os
 import random
 import csv
+import sys
 import time
+
+# Use src path so that the python interpreter can access all modules
+sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 
 from sklearn.model_selection import KFold
 
-from classifier.FullTextFastTextModel.FullTextFastTextModel import FullTextFastTextModel
-from classifier.FullTextFastTextModel.validation.FullTextFastTextModelDescOnly import FullTextFastTextModelDescOnly
-from classifier.FullTextFastTextModel.validation.FullTextFastTextModelTitleOnlyl import FullTextFastTextModelTitleOnly
-from classifier.FullTextSvmModel.FullTextSvmModel import FullTextSvmModel
-from classifier.FullTextSvmModel.validation.FullTextSvmModelDescOnly import FullTextSvmModelDescOnly
-from classifier.FullTextSvmModel.validation.FullTextSvmModelTitleOnly import FullTextSvmModelTitleOnly
-from classifier.FullTextTransformerModel.FullTextTransformerModel import FullTextTransformerModel
-from classifier.FullTextTransformerModel.config.TransformerModelConfig import PytorchTransformerConfig
-from entity.Tender import Tender
+from src.classifier.FullTextFastTextModel.FullTextFastTextModel import FullTextFastTextModel
+from src.classifier.FullTextFastTextModel.validation.FullTextFastTextModelDescOnly import FullTextFastTextModelDescOnly
+from src.classifier.FullTextFastTextModel.validation.FullTextFastTextModelTitleOnlyl import FullTextFastTextModelTitleOnly
+from src.classifier.FullTextSvmModel.FullTextSvmModel import FullTextSvmModel
+from src.classifier.FullTextSvmModel.validation.FullTextSvmModelDescOnly import FullTextSvmModelDescOnly
+from src.classifier.FullTextSvmModel.validation.FullTextSvmModelTitleOnly import FullTextSvmModelTitleOnly
+from src.classifier.FullTextTransformerModel.FullTextTransformerModel import FullTextTransformerModel
+from src.classifier.FullTextTransformerModel.config.TransformerModelConfig import PytorchTransformerConfig
+from src.entity.Tender import Tender
 
 models = {
     "FullTextFastTextModel": FullTextFastTextModel(),

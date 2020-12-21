@@ -5,13 +5,12 @@ from typing import List
 
 import pandas as pd
 import fasttext.util
-from sklearn import svm
 from spacy.lang.de.stop_words import STOP_WORDS
 
 from spacy.lang.de import German
 
-from classifier.TenderClassClassifier import TenderClassClassifier
-from entity.ValidationResult import ValidationResult
+from src.classifier.TenderClassClassifier import TenderClassClassifier
+from src.entity.ValidationResult import ValidationResult
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 from src.entity.Tender import Tender
 

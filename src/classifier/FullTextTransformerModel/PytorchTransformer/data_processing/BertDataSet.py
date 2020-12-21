@@ -1,9 +1,9 @@
 import torch
 from torch.utils.data import Dataset
 
-from classifier.FullTextTransformerModel.config.TransformerModelConfig import \
+from src.classifier.FullTextTransformerModel.config.TransformerModelConfig import \
     PytorchTransformerConfig
-from classifier.FullTextTransformerModel.PytorchTransformer.data_processing.BertPreprocessor import BertPreprocessor
+from src.classifier.FullTextTransformerModel.PytorchTransformer.data_processing.BertPreprocessor import BertPreprocessor
 
 
 class BertDataSet(Dataset):

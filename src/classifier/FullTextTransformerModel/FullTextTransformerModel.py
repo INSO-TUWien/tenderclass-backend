@@ -7,13 +7,13 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from pytorch_lightning.loggers import WandbLogger
 
-from classifier.FullTextTransformerModel.PytorchTransformer.PyTorchLighningTransformer import \
+from src.classifier.FullTextTransformerModel.PytorchTransformer.PyTorchLighningTransformer import \
     PyTorchTransformerLightning
-from classifier.FullTextTransformerModel.config.TransformerModelConfig import \
+from src.classifier.FullTextTransformerModel.config.TransformerModelConfig import \
     PytorchTransformerConfig
-from classifier.FullTextTransformerModel.PytorchTransformer.data_processing.BertDataSet import BertDataSet
-from classifier.TenderClassClassifier import TenderClassClassifier
-from entity.ValidationResult import ValidationResult
+from src.classifier.FullTextTransformerModel.PytorchTransformer.data_processing.BertDataSet import BertDataSet
+from src.classifier.TenderClassClassifier import TenderClassClassifier
+from src.entity.ValidationResult import ValidationResult
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 from src.entity.Tender import Tender
 
