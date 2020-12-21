@@ -21,7 +21,7 @@ class FullTextTransformerModel(TenderClassClassifier):
 
     def __init__(self):
         self.config: PytorchTransformerConfig = PytorchTransformerConfig.bert_german()
-        self.model: PyTorchTransformerLightning = self.create_new_model()
+        self.create_new_model()
 
     def classify(self, tenders: List[Tender]):
         titles = list(map(lambda x: x.get_title("EN"), tenders))
@@ -75,13 +75,8 @@ class FullTextTransformerModel(TenderClassClassifier):
     def save_model(self):
         torch.save(self.model.state_dict(), "./data/" + self.config.name)
 
-    def create_new_model(self):
+    def create_new_model(self, *args):
+        if args[0] is not None:
+            self.config = args[0]
+
         self.model = PyTorchTransformerLightning(self.config)
-
-        try:
-            self.model.load_state_dict(torch.load("./data/" + self.config.name))
-            self.model.eval()
-        except:
-            pass
-
-        return self.model

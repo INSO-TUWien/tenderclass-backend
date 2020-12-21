@@ -16,9 +16,6 @@ class PyTorchTransformerLightning(LightningModule):
         # Specify number of input feature, size of hidden state and number of output features
         D_in, H, D_out = 768, 50, 2
 
-        self.loss_fn = torch.nn.CrossEntropyLoss()
-        self.total_steps = total_steps
-
         # Instantiate pretrained model
         self.model_title = config.model_title if config.model_title is not None else self.empty_model
         self.model_desc = config.model_desc if config.model_desc is not None else self.empty_model
@@ -28,10 +25,11 @@ class PyTorchTransformerLightning(LightningModule):
             nn.Linear(D_in * self.config.num_models, H),
             nn.ReLU(),
             nn.Dropout(0.1),
-            nn.Linear(H, D_out)
+            nn.Linear(H, D_out),
+            nn.Sigmoid()
         )
 
-        # Freeze the BERT model
+        # Freeze the pretrained model
         if config.freeze_pretrained_layers:
             if config.model_title is not None:
                 for param in self.model_title.parameters():
@@ -39,6 +37,9 @@ class PyTorchTransformerLightning(LightningModule):
             if config.model_desc is not None:
                 for param in self.model_desc.parameters():
                     param.requires_grad = False
+
+        self.loss_fn = torch.nn.CrossEntropyLoss()
+        self.total_steps = total_steps
 
     def empty_model(self, input_ids, attention_mask):
         return None
