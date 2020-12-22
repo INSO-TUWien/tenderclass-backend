@@ -1,3 +1,4 @@
+import gc
 from typing import List
 
 import pandas as pd
@@ -95,5 +96,9 @@ class FullTextTransformerModel(TenderClassClassifier):
     def create_new_model(self, *args):
         if len(args) is 1:
             self.config = args[0]
+
+        del self.model
+        torch.cuda.empty_cache()
+        gc.collect()
 
         self.model = PyTorchTransformerLightning(self.config)
