@@ -21,10 +21,11 @@ from src.entity.Tender import Tender
 
 class FullTextTransformerModel(TenderClassClassifier):
 
-    def __init__(self, config=PytorchTransformerConfig.bert_german_full()):
+    def __init__(self, config_class=PytorchTransformerConfig.bert_german_full):
+        self.configClass = config_class
         self.config = None
         self.model = None
-        self.create_new_model(config)
+        self.create_new_model(self.configClass)
 
     def predict(self, df):
         data = BertDataSet(df, self.config)
@@ -95,10 +96,12 @@ class FullTextTransformerModel(TenderClassClassifier):
 
     def create_new_model(self, *args):
         if len(args) is 1:
-            self.config = args[0]
+            self.configClass = args[0]
 
         del self.model
+        del self.config
         torch.cuda.empty_cache()
         gc.collect()
 
+        self.config = self.configClass()
         self.model = PyTorchTransformerLightning(self.config)

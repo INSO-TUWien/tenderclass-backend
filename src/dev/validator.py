@@ -24,9 +24,9 @@ from src.classifier.FullTextTransformerModel.config.TransformerModelConfig impor
 from src.entity.Tender import Tender
 
 models = {
-    #"FullTextTransformerModel": FullTextTransformerModel(PytorchTransformerConfig.bert_german_full()),
-    #"FullTextTransformerModelTitleOnly": FullTextTransformerModel(PytorchTransformerConfig.bert_german_title_only()),
-    #"FullTextTransformerModelDescOnly": FullTextTransformerModel(PytorchTransformerConfig.bert_german_description_only()),
+    #"FullTextTransformerModel": FullTextTransformerModel(PytorchTransformerConfig.bert_german_full),
+    #"FullTextTransformerModelTitleOnly": FullTextTransformerModel(PytorchTransformerConfig.bert_german_title_only),
+    #"FullTextTransformerModelDescOnly": FullTextTransformerModel(PytorchTransformerConfig.bert_german_description_only),
     #"FullTextFastTextModel": FullTextFastTextModel(),
     #"FullTextFastTextModelTitleOnly": FullTextFastTextModelTitleOnly(),
     #"FullTextFastTextModelDescOnly": FullTextFastTextModelDescOnly(),
