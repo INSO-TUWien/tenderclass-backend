@@ -50,7 +50,7 @@ class PytorchTransformerConfig:
         tokenizer = AutoTokenizer.from_pretrained("bert-base-german-cased")
         model = AutoModel.from_pretrained("bert-base-german-cased")
 
-        return PytorchTransformerConfig(None, tokenizer, None, model, use_title=False, max_len_desc=300, batch_size=4,
+        return PytorchTransformerConfig(None, tokenizer, None, model, use_title=False, max_len_desc=300, batch_size=16,
                                         epochs=4, name="bert_german_description_only", freeze_pretrained_layers=False)
 
     @classmethod
