@@ -95,7 +95,7 @@ class FullTextTransformerModel(TenderClassClassifier):
         torch.save(self.model.state_dict(), "./data/" + self.config.name)
 
     def create_new_model(self, *args):
-        if len(args) is 1:
+        if len(args) == 1:
             self.configClass = args[0]
 
         del self.model

@@ -22,11 +22,11 @@ class BertPreprocessor:
         title_ids, title_mask, desc_ids, desc_mask = ([], [], [], [])
 
         if config.use_title:
-            title_ids, title_mask = BertPreprocessor.preprocessing_for_bert(title, config.tokenizer_title,
+            title_ids, title_mask = BertPreprocessor.preprocessing_for_bert(title, config.tokenizer,
                                                                           config.max_len_title)
 
         if config.use_desc:
-            desc_ids, desc_mask = BertPreprocessor.preprocessing_for_bert(desc, config.tokenizer_desc,
+            desc_ids, desc_mask = BertPreprocessor.preprocessing_for_bert(desc, config.tokenizer,
                                                                         config.max_len_desc)
 
         sample = {'title_input_ids': title_ids, 'title_attention_mask': title_mask, 'description_input_ids': desc_ids,

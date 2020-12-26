@@ -17,8 +17,7 @@ class PyTorchTransformerLightning(LightningModule):
         D_in, H, D_out = 768, 50, 2
 
         # Instantiate pretrained model
-        self.model_title = config.model_title if config.model_title is not None else self.empty_model
-        self.model_desc = config.model_desc if config.model_desc is not None else self.empty_model
+        self.model = config.model
 
         # Instantiate an one-layer feed-forward classifier
         self.classifier = nn.Sequential(
@@ -31,12 +30,8 @@ class PyTorchTransformerLightning(LightningModule):
 
         # Freeze the pretrained model
         if config.freeze_pretrained_layers:
-            if config.model_title is not None:
-                for param in self.model_title.parameters():
-                    param.requires_grad = False
-            if config.model_desc is not None:
-                for param in self.model_desc.parameters():
-                    param.requires_grad = False
+            for param in self.model.parameters():
+                param.requires_grad = False
 
         self.loss_fn = torch.nn.CrossEntropyLoss()
         self.total_steps = total_steps
@@ -60,15 +55,16 @@ class PyTorchTransformerLightning(LightningModule):
         return [optimizer], [scheduler]
 
     def forward(self, title_input_ids, title_attention_masks, description_input_ids, description_attention_masks):
-        # Feed input to BERT
-        outputs_titles = self.model_title(input_ids=title_input_ids, attention_mask=title_attention_masks)
-        outputs_descs = self.model_desc(input_ids=description_input_ids, attention_mask=description_attention_masks)
 
         if self.config.use_title is False:
+            outputs_descs = self.model(input_ids=description_input_ids, attention_mask=description_attention_masks)
             output = outputs_descs[0][:, 0, :]
         elif self.config.use_desc is False:
+            outputs_titles = self.model(input_ids=title_input_ids, attention_mask=title_attention_masks)
             output = outputs_titles[0][:, 0, :]
         else:
+            outputs_titles = self.model(input_ids=title_input_ids, attention_mask=title_attention_masks)
+            outputs_descs = self.model(input_ids=description_input_ids, attention_mask=description_attention_masks)
             output = torch.cat((outputs_titles[0][:, 0, :], outputs_descs[0][:, 0, :]), dim=1)
 
         logits = self.classifier(output)
