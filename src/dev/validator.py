@@ -8,6 +8,7 @@ import gc
 
 # Use src path so that the python interpreter can access all modules
 import torch
+from memory_profiler import profile
 
 sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 
@@ -44,6 +45,7 @@ def load(path):
 
 
 class Validator:
+    @profile
     def __init__(self):
         self.start = time.time()
         labelled_tenders = self.get_tenders()
@@ -58,7 +60,9 @@ class Validator:
             print('train: %s, test: %s' % (len(train), len(test)))
             for name, impl in models.items():
                 impl.create_new_model()
+                begin = time.time()
                 impl.train([labelled_tenders[i] for i in train])
+                print(time.time() - begin)
                 self.write_result(name, iteration, impl.validate([labelled_tenders[i] for i in test]))
                 torch.cuda.empty_cache()
                 gc.collect()
