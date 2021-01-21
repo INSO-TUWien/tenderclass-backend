@@ -1,3 +1,4 @@
+pytorch-lightning~=1.1.4
 scikit-learn~=0.23.1
 joblib~=0.16.0
 simpletransformers
@@ -12,10 +13,9 @@ pandas~=1.0.4
 marshmallow~=3.7.1
 nltk~=3.5
 sklearn~=0.0
-torch~=1.6.0
+torch~=1.7.1
 torchvision
 wandb
 fasttext
 matplotlib~=3.3.2
-transformers~=3.1.0
 memory_profiler

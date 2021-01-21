@@ -42,14 +42,17 @@ Run on Linux: `$ source venv/bin/activate`
 3. Install all the required dependecies using Python packet manager `pip`.<br/>
 `$ pip install -r requirements.txt`
 
-4. Install the spaCy german language model.<br/>
+4. The Transformers package has to be installed from source.<br/>
+`pip install git+https://github.com/huggingface/transformers.git`
+
+5. Install the spaCy german language model.<br/>
 `$ python -m spacy download de`
 
-5. Navigate to the `src` directory and start the web server by running `main.py`.<br/>
+6. Navigate to the `src` directory and start the web server by running `main.py`.<br/>
 `$ cd src`<br/>
 `$ python main.py`
 
-6. OPTIONAL: Deactive the virtual environment:<br/>
+7. OPTIONAL: Deactive the virtual environment:<br/>
 Run on Windows: `$ venv\Scripts\deactivate.bat`<br/>
 Run on Linux: `$ source venv/bin/deactivate`
 
