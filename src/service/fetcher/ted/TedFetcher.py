@@ -1,6 +1,6 @@
 from typing import List
-from src.fetcher.ted.TedDownloader import TedDownloader
-from src.fetcher.ted.TedExtractor import TedExtractor
+from src.service.fetcher.ted.TedDownloader import TedDownloader
+from src.service.fetcher.ted.TedExtractor import TedExtractor
 import sys
 
 

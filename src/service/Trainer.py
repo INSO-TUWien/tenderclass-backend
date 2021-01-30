@@ -1,5 +1,5 @@
 from src import config
-from src.fetcher.Fetcher import Fetcher
+from src.service.fetcher.Fetcher import Fetcher
 import random
 import logging
 

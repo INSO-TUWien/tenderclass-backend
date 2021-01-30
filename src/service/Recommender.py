@@ -1,4 +1,4 @@
-from src.fetcher.Fetcher import Fetcher
+from src.service.fetcher.Fetcher import Fetcher
 
 
 class Recommender:

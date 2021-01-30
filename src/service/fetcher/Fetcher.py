@@ -1,7 +1,7 @@
 from typing import List
 
 from src.entity.Tender import Tender
-from src.fetcher.ted.TedFetcher import TedFetcher
+from src.service.fetcher.ted.TedFetcher import TedFetcher
 
 
 class Fetcher:
