@@ -10,5 +10,5 @@ class CreateNewValidation(Schema):
     neg_search_criteria = fields.String(required=True)
 
     @post_load
-    def make_user(self, data, **kwargs):
+    def make_model(self, data, **kwargs):
         return NewModelModel(**data)

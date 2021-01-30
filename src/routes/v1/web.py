@@ -1,6 +1,4 @@
 from flask import Blueprint, request, jsonify
-from datetime import date
-from datetime import datetime
 from src.config import tender_recommender, tender_trainer
 
 web_blueprint = Blueprint('web_blueprint', __name__)

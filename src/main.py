@@ -8,6 +8,8 @@ from flask_cors import CORS
 import logging
 
 # Use src path so that the python interpreter can access all modules
+from src.routes.v1.fetch import fetch_blueprint
+
 sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 
 # import routes
@@ -28,6 +30,7 @@ app = Flask(__name__)
 app.register_blueprint(model_blueprint, url_prefix="/api/v1/model")
 app.register_blueprint(web_blueprint, url_prefix="/api/v1/web")
 app.register_blueprint(persistence_blueprint, url_prefix="/api/v1/persistence")
+app.register_blueprint(fetch_blueprint, url_prefix="/api/v1/fetch")
 CORS(app)
 
 # set up Swagger documentation
