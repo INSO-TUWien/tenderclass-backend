@@ -1,4 +1,6 @@
 from typing import List
+
+from src.Models.TedSaveModel import TedSaveModel
 from src.service.fetcher.ted.TedDownloader import TedDownloader
 from src.service.fetcher.ted.TedExtractor import TedExtractor
 import sys
@@ -15,6 +17,9 @@ class TedFetcher:
     def __init__(self):
         self.ted_downloader = TedDownloader()
         self.ted_extractor = TedExtractor()
+
+    def from_ted_save_model(self, model: TedSaveModel):
+        return self.get(model.amount, search_criteria=model.search_criteria, languages=model.original_languages)
 
     def get(self, count: int, load_documents: bool = False, search_criteria: str = "", languages: List[str] = ["DE", "EN"],
             page_offset: int = 0):
@@ -37,11 +42,9 @@ class TedFetcher:
                     doc = self.ted_extractor.extract(xml_doc, languages)
 
                     if doc is not None:
-
                         documents = []
                         if load_documents:
                             pass
-
                             # doc_links = self.ted_extractor.extract_doc_links(xml_doc)
                             # logger.info("found doc links: " + str(doc_links))
                             # for doc_link in doc_links:

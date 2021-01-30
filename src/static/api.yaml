@@ -150,18 +150,12 @@ components:
         description: 'Für unser hauseigenes ERP-System soll ein Erweiterungsmodul entwickelt werden, das erlaubt, Python-Skripte einzubetten.'
     fetch_ted_model:
       type: object
-      required: ["pos_number", "neg_number", "pos_search_criteria", "neg_search_criteria", "dataset_name"]
+      required: ["amount", "search_criteria", "dataset_name"]
       properties:
-        pos_number:
+        amount:
           type: integer
           format: integer
-        neg_number:
-          type: integer
-          format: integer
-        pos_search_criteria:
-          type: integer
-          format: integer
-        neg_search_criteria:
+        search_criteria:
           type: integer
           format: integer
         original_languages:
@@ -172,10 +166,8 @@ components:
           type: string
           format: string
       example:
-        pos_number: 1000
-        neg_number: 1000
-        pos_search_criteria: " AND PC=[72*]"
-        neg_search_criteria: " AND NOT PC=[72*]"
+        amount: 1000
+        search_criteria: " AND PC=[72*]"
         original_languages:
           - "DE"
           - "EN"
