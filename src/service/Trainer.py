@@ -33,19 +33,8 @@ class Trainer:
         if (pos_number + neg_number) == 0:
             return
 
-        if config.develop:
-            try:
-                pos_tenders = self.persistence.load("dev_pos_tenders.json")
-                neg_tenders = self.persistence.load("dev_neg_tenders.json")
-            except:
-                pos_tenders = self.tender_fetcher.get(pos_number, search_criteria=pos_search_criteria)
-                neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
-
-                self.persistence.save(pos_tenders, "dev_pos_tenders.json")
-                self.persistence.save(neg_tenders, "dev_neg_tenders.json")
-        else:
-            pos_tenders = self.tender_fetcher.get(pos_number, search_criteria=pos_search_criteria)
-            neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
+        pos_tenders = self.tender_fetcher.get(pos_number, search_criteria=pos_search_criteria)
+        neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
 
         self.train_from_entities(neg_tenders, pos_tenders)
 

@@ -18,4 +18,3 @@ tender_recommender = Recommender(tender_model)
 tender_trainer = Trainer(tender_model)
 tender_persistence = Persistence()
 tender_fetcher: Fetcher = Fetcher()
-develop = True
