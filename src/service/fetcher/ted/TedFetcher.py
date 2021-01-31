@@ -1,6 +1,7 @@
 from typing import List
 
 from src.Models.TedSaveModel import TedSaveModel
+from src.entity.Tender import Tender
 from src.service.fetcher.ted.TedDownloader import TedDownloader
 from src.service.fetcher.ted.TedExtractor import TedExtractor
 import sys
@@ -19,10 +20,22 @@ class TedFetcher:
         self.ted_extractor = TedExtractor()
 
     def from_ted_save_model(self, model: TedSaveModel):
-        return self.get(model.amount, search_criteria=model.search_criteria, languages=model.original_languages)
+        return self.get(count=model.amount, search_criteria=model.search_criteria,
+                        original_languages=model.original_languages, languages=model.languages)
 
-    def get(self, count: int, load_documents: bool = False, search_criteria: str = "", languages: List[str] = ["DE", "EN"],
-            page_offset: int = 0):
+    def get(self, count: int, load_documents: bool = False, search_criteria: str = "", original_languages=[],
+            languages: List[str] = ["DE", "EN"], page_offset: int = 0):
+
+        if original_languages is None:
+            original_languages = []
+
+        if languages is None:
+            languages = []
+
+        # each original language must occur in the ifnal tender entity
+        for language in original_languages:
+            if language not in languages:
+                languages.append(language)
 
         if count <= 0:
             count = sys.maxsize
@@ -39,7 +52,7 @@ class TedFetcher:
             for xml_doc in xml_docs:
                 if xml_doc is not None:
 
-                    doc = self.ted_extractor.extract(xml_doc, languages)
+                    doc: Tender = self.ted_extractor.extract(xml_doc, languages)
 
                     if doc is not None:
                         documents = []
@@ -51,7 +64,12 @@ class TedFetcher:
                             #    documents.append(doc_parse.get_doc_content(doc_link))
                             # TODO add document links to tender
 
-                        ted_docs.append(doc)
+                        # if filter by orignal language then just use tender in those languages
+                        if len(original_languages) > 0:
+                            if doc.original_lang in original_languages:
+                                ted_docs.append(doc)
+                        else:
+                            ted_docs.append(doc)
 
                         if len(ted_docs) >= count:
                             return ted_docs

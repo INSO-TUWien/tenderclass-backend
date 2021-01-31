@@ -162,13 +162,19 @@ components:
           type: array
           items:
             type: string
+        languages:
+          type: array
+          items:
+            type: string
         dataset_name:
           type: string
           format: string
       example:
-        amount: 1000
-        search_criteria: " AND PC=[72*]"
+        amount: 100
+        search_criteria: " AND PC=[72*] AND CY=[DE OR FR] "
         original_languages:
           - "DE"
+          - "FR"
+        languages:
           - "EN"
         dataset_name: "example-dataset"

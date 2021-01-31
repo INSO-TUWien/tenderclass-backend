@@ -8,6 +8,8 @@ class Persistence:
     def save(self, tenders, path):
         with open("./data/" + path, 'w', encoding='utf8') as json_file:
             json.dump(list(map(lambda x: x.get_dict(), tenders)), json_file, ensure_ascii=False)
+            json_file.flush()
+            json_file.close()
 
     def load(self, path):
         with open("./data/" + path, 'r', encoding='utf8') as json_file:
