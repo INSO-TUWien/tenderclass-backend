@@ -1,9 +1,9 @@
-from src import config
-from src.service.fetcher.Fetcher import Fetcher
+from src.Models.FromDatasetsModelModel import FromDatasetsModel
 import random
 import logging
 
 from src.persistence.Persistence import Persistence
+from src.service.fetcher.Fetcher import Fetcher
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -37,6 +37,12 @@ class Trainer:
         neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
 
         self.train_from_entities(neg_tenders, pos_tenders)
+
+    def load_and_train(self, model: FromDatasetsModel):
+        pos_tenders = self.persistence.load(model.pos_filename)
+        neg_tenders = self.persistence.load(model.neg_filename)
+
+        return self.train_from_entities(neg_tenders, pos_tenders)
 
     def train_from_entities(self, neg_tenders, pos_tenders):
         pos_labels = [1] * len(pos_tenders)

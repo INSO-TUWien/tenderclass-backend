@@ -58,6 +58,21 @@ paths:
       responses:
         '200':
           description: OK
+  /model/from-datasets:
+    post:
+      tags:
+        - ML Model
+      summary: Create a new model from already fetched dataset
+      requestBody:
+        description: Location of the positive and negative training instances
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-from-datasets-model'
+      responses:
+        '200':
+          description: OK
   /fetch/ted:
     post:
       tags:
@@ -132,6 +147,18 @@ components:
         neg_number: 1000
         pos_search_criteria: " AND PC=[72*]"
         neg_search_criteria: " AND NOT PC=[72*]"
+    create-from-datasets-model:
+      type: object
+      properties:
+        pos_filename:
+          type: string
+          format: string
+        neg_filename:
+          type: string
+          format: string
+      example:
+        pos_filename: "example-pos.json"
+        neg_filename: "example-neg.json"
     languageentity:
       type: object
       properties:
