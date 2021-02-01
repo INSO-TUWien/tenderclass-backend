@@ -43,6 +43,7 @@ class SpacyScikitModel(TenderClassClassifier):
         self.stopwords = list(STOP_WORDS)
         self.stopwords.extend(self.domain_stopwords)
         self.pipe = None
+        self.create_new_model()
 
     def spacy_tokenizer(self, sentence):
         sentence_tokens = self.parser(sentence)
@@ -66,26 +67,24 @@ class SpacyScikitModel(TenderClassClassifier):
         def get_params(self, deep=True):
             return {}
 
-    def __load_model(self):
-        if not self.pipe:
-            self.pipe = joblib.load(MODEL_NAME)
-
     def __convert_to_input(self, tenders):
         titles = list(map(lambda x: x.get_title(LANGUAGE), tenders))
         return titles
 
     def classify(self, tenders):
-        self.__load_model()
-
         titles = self.__convert_to_input(tenders)
         predictions = self.pipe.predict(titles)
         tuples = zip(tenders, predictions)
         selected_tenders = [t for t, p in tuples if p == 1]
         return selected_tenders
 
-    def train(self, labelled_tenders):
-        self.__load_model()
+    def load(self, name):
+        self.pipe = joblib.load("./data/" + name)
 
+    def save(self, name):
+        joblib.dump(self.pipe, "./data/" + name)
+
+    def train(self, labelled_tenders):
         tenders = [i for i, j in labelled_tenders]
         labels = [j for i, j in labelled_tenders]
         titles = self.__convert_to_input(tenders)
@@ -103,7 +102,6 @@ class SpacyScikitModel(TenderClassClassifier):
         tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
         logger.info(f"tn: {tn} fp: {fp}")
         logger.info(f"fn: {fn} tp:{tp}")
-        joblib.dump(self.pipe, MODEL_NAME)
 
         print("Score:")
         print(accuracy_score(y_test, y_pred))
@@ -117,5 +115,3 @@ class SpacyScikitModel(TenderClassClassifier):
         self.pipe = Pipeline([("cleaner", predictor),
                               ('vectorizer', vectorizer),
                               ('classifier', classifier)])
-
-        joblib.dump(self.pipe, MODEL_NAME)
