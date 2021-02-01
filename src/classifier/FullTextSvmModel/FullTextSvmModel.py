@@ -1,5 +1,6 @@
 import logging
 
+import joblib
 import pandas as pd
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
@@ -33,6 +34,7 @@ class FullTextSvmModel(TenderClassClassifier):
 
         self.stopwords = list(STOP_WORDS)
         self.stopwords.extend(self.domain_stopwords)
+        self.model = None
         self.create_new_model()
 
     def tokenize(self, sentence):
@@ -75,34 +77,33 @@ class FullTextSvmModel(TenderClassClassifier):
         return ValidationResult(ylabels, y_pred)
 
     def load(self, name):
-        pass
+        self.model = joblib.load("./data/" + name)
 
     def save(self, name):
-        pass
+        joblib.dump(self.model, "./data/" + name)
+
+    class Extractor(BaseEstimator, TransformerMixin):
+        def __init__(self, column):
+            self.column = column
+            pass
+
+        def transform(self, df, y=None):
+            return df[self.column]
+
+        def fit(self, df, y=None):
+            return self
 
     def create_new_model(self):
-        class Ectractor(BaseEstimator, TransformerMixin):
-
-            def __init__(self, column):
-                self.column = column
-                pass
-
-            def transform(self, df, y=None):
-                return df[self.column]
-
-            def fit(self, df, y=None):
-                return self
-
         pipeline = Pipeline([
             ('union', FeatureUnion(
                 transformer_list=[
                     ('titles', Pipeline([
-                        ('selector', Ectractor(column="titles")),
+                        ('selector', self.Extractor(column="titles")),
                         ('vect', CountVectorizer(max_features=1000, tokenizer=self.tokenize, ngram_range=(1, 2))),
                         ('tfidf', TfidfTransformer())
                     ])),
                     ('descriptions', Pipeline([
-                        ('selector', Ectractor(column="descriptions")),
+                        ('selector', self.Extractor(column="descriptions")),
                         ('vect', CountVectorizer(max_features=1000, tokenizer=self.tokenize, ngram_range=(1, 2))),
                         ('tfidf', TfidfTransformer())
                     ])),
@@ -111,4 +112,4 @@ class FullTextSvmModel(TenderClassClassifier):
             ('svc', SVC(kernel="linear", random_state=0)),
         ])
 
-        self.model = pipeline
+        self.model = None
