@@ -11,7 +11,7 @@ ted_save_validation = TedSaveValidation()
 
 
 @fetch_blueprint.route("/ted", methods=['POST'])
-def post_create_new():
+def fetch():
     try:
         model = ted_save_validation.load(request.json)
         tender_fetcher.fetch_and_save(model)

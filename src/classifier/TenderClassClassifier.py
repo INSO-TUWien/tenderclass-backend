@@ -18,3 +18,11 @@ class TenderClassClassifier(ABC):
     @abstractmethod
     def classify(self, tenders):
         pass
+
+    @abstractmethod
+    def save(self, name):
+        pass
+
+    @abstractmethod
+    def load(self, name):
+        pass

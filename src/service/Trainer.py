@@ -2,6 +2,7 @@ from src.Models.FromDatasetsModelModel import FromDatasetsModel
 import random
 import logging
 
+from src.Models.ModelNameModel import ModelNameModel
 from src.persistence.Persistence import Persistence
 from src.service.fetcher.Fetcher import Fetcher
 
@@ -19,6 +20,15 @@ class Trainer:
         self.tender_model = tender_model
         self.persistence = Persistence()
 
+    def create_new(self):
+        self.tender_model.create_new_model()
+
+    def save(self, model: ModelNameModel):
+        self.tender_model.save(model.name)
+
+    def load(self, model: ModelNameModel):
+        self.tender_model.load(model.name)
+
     def train(self, tender_ids, labels):
         search_arg = " OR ".join(tender_ids)
         search_criteria = f" AND ND=[{search_arg}]"
@@ -27,16 +37,6 @@ class Trainer:
         labelled_tenders = list(map(lambda x: (x, labels[tender_ids.index(x.id)], tenders)))
 
         self.tender_model.train(labelled_tenders)
-
-    def create_and_init(self, pos_number, pos_search_criteria, neg_number, neg_search_criteria):
-        self.tender_model.create_new_model()
-        if (pos_number + neg_number) == 0:
-            return
-
-        pos_tenders = self.tender_fetcher.get(pos_number, search_criteria=pos_search_criteria)
-        neg_tenders = self.tender_fetcher.get(neg_number, search_criteria=neg_search_criteria)
-
-        self.train_from_entities(neg_tenders, pos_tenders)
 
     def load_and_train(self, model: FromDatasetsModel):
         pos_tenders = self.persistence.load(model.pos_filename)

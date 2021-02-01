@@ -48,21 +48,44 @@ paths:
       tags:
         - ML Model
       summary: Create a new model
+      responses:
+        '200':
+          description: OK
+  /model/save:
+    post:
+      tags:
+        - ML Model
+      summary: Save a trained model
       requestBody:
-        description: Model training configuration
+        description: Model name
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/trainingconfiguration'
+              $ref: '#/components/schemas/model_name'
       responses:
         '200':
           description: OK
-  /model/from-datasets:
+  /model/load:
     post:
       tags:
         - ML Model
-      summary: Create a new model from already fetched dataset
+      summary: Load a trained model
+      requestBody:
+        description: Model name
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/model_name'
+      responses:
+        '200':
+          description: OK
+  /model/train-from-datasets:
+    post:
+      tags:
+        - ML Model
+      summary: Train a model from already fetched dataset
       requestBody:
         description: Location of the positive and negative training instances
         required: true
@@ -175,6 +198,14 @@ components:
         language: DE
         title: Software- und Systemprogrammierung für hauseigenes ERP-System
         description: 'Für unser hauseigenes ERP-System soll ein Erweiterungsmodul entwickelt werden, das erlaubt, Python-Skripte einzubetten.'
+    model_name:
+      type: object
+      properties:
+        name:
+          type: string
+          format: string
+      example:
+        name: "example-model"
     fetch_ted_model:
       type: object
       required: ["amount", "search_criteria", "dataset_name"]

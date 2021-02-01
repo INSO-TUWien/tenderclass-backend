@@ -74,6 +74,12 @@ class FullTextSvmModel(TenderClassClassifier):
         y_pred = self.model.predict(X)
         return ValidationResult(ylabels, y_pred)
 
+    def load(self, name):
+        pass
+
+    def save(self, name):
+        pass
+
     def create_new_model(self):
         class Ectractor(BaseEstimator, TransformerMixin):
 
