@@ -25,7 +25,6 @@ class FullTextTransformerModel(TenderClassClassifier):
         self.configClass = config_class
         self.config = None
         self.model = None
-        self.create_new_model(self.configClass)
 
     def predict(self, df):
         data = BertDataSet(df, self.config)
@@ -43,6 +42,13 @@ class FullTextTransformerModel(TenderClassClassifier):
             predictions.append(predicted.data[0].item())
 
         return predictions
+
+    def load(self, name):
+        self.create_new_model()
+        self.model.load_state_dict(torch.load("./data/" + name))
+
+    def save(self, name):
+        torch.save(self.model.state_dict(), "./data/" + name)
 
     def classify(self, tenders: List[Tender]):
         titles = list(map(lambda x: x.get_title("DE"), tenders))
@@ -94,10 +100,7 @@ class FullTextTransformerModel(TenderClassClassifier):
     def save_model(self):
         torch.save(self.model.state_dict(), "./data/" + self.config.name)
 
-    def create_new_model(self, *args):
-        if len(args) == 1:
-            self.configClass = args[0]
-
+    def create_new_model(self):
         del self.model
         del self.config
         torch.cuda.empty_cache()

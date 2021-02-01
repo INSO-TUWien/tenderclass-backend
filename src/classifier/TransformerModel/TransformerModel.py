@@ -3,6 +3,7 @@ import pandas as pd
 import logging
 import torch
 import time
+from simpletransformers.classification import ClassificationModel
 
 from sklearn.model_selection import train_test_split
 
@@ -19,30 +20,26 @@ args = {
 
 cuda_available = torch.cuda.is_available()
 
+
 class TransformerModel(TenderClassClassifier):
     """
     This class provides the Machine Learning model and classifies tenders based on previous training data.
     """
 
-    def load_model(self):
-        if not self.model:
-            from simpletransformers.classification import ClassificationModel
-            try:
-                self.model = ClassificationModel('bert', './outputs/', use_cuda=cuda_available, args=args)
-            except Exception as ex:
-                logger.error(f"could not load model from /outputs due to {str(ex)}, creating new model")
-                self.create_new_model()
-
     def __init__(self):
         self.model = None
+
+    def load(self, name):
+        self.model = ClassificationModel('bert', './outputs/', use_cuda=cuda_available, args=args)
+
+    def save(self, name):
+        pass
 
     def __convert_to_input(self, tenders):
         titles = list(map(lambda x: x.get_title("DE"), tenders))
         return titles
 
     def classify(self, tenders):
-        self.load_model()
-
         titles = self.__convert_to_input(tenders)
         predictions, raw_output = self.model.predict(titles)
         tuples = zip(tenders, predictions)
@@ -51,13 +48,12 @@ class TransformerModel(TenderClassClassifier):
         return selected_tenders
 
     def train(self, labelled_tenders):
-        self.load_model()
-
         tenders = [i for i, j in labelled_tenders]
         tenders = self.__convert_to_input(tenders)
         labels = [j for i, j in labelled_tenders]
 
-        tenders_train, tenders_test, labels_train, labels_test = train_test_split(tenders, labels, test_size=0.1, random_state=42)
+        tenders_train, tenders_test, labels_train, labels_test = train_test_split(tenders, labels, test_size=0.1,
+                                                                                  random_state=42)
 
         data_input = pd.DataFrame(zip(tenders_train, labels_train))
 
