@@ -142,6 +142,9 @@ components:
           type: array
           items:
             type: string
+        original_lang:
+          type: string
+          format: string
         languageEntities:
           type: array
           items:
