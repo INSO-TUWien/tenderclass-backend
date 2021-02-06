@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 import joblib
 import pandas as pd
@@ -11,6 +12,7 @@ from spacy.lang.de.stop_words import STOP_WORDS
 import string
 
 from src.classifier.TenderClassClassifier import TenderClassClassifier
+from src.entity.Tender import Tender
 from src.entity.ValidationResult import ValidationResult
 from src.entity.LabeledTenderCollection import LabelledTenderCollection
 
@@ -44,9 +46,18 @@ class FullTextSvmModel(TenderClassClassifier):
         sentence_tokens = [word for word in sentence_tokens if word not in self.stopwords and word not in punctuations]
         return sentence_tokens
 
-    def classify(self, tenders):
-        titles = list(map(lambda x: x.get_title("DE"), tenders))
-        predictions = self.model.predict(titles)
+    def classify(self, tenders: List[Tender]):
+
+        if len(tenders) is 0:
+            return tenders
+
+        titles = list(map(lambda x: x.get_original_language_entity().title, tenders))
+        descriptions = list(map(lambda x: x.get_original_language_entity().description, tenders))
+
+        df = pd.DataFrame({"titles": titles, "descriptions": descriptions})
+        df = df.dropna()
+
+        predictions = self.model.predict(df)
         tuples = zip(tenders, predictions)
         selected_tenders = [t for t, p in tuples if p == 1]
         return selected_tenders
