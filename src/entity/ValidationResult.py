@@ -1,8 +1,4 @@
-from typing import List
-
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
-
-from src.entity.TenderLanguageEntity import TenderLanguageEntity
 
 
 class ValidationResult:
@@ -16,3 +12,15 @@ class ValidationResult:
         self.precision = precision_score(labels, pred)
         self.recall = recall_score(labels, pred)
         self.f1 = f1_score(labels, pred)
+
+    def toDict(self):
+        return {
+            "tn": self.tn.item(),
+            "fp": self.fp.item(),
+            "fn": self.fn.item(),
+            "tp": self.tp.item(),
+            "accuracy": self.accuracy,
+            "precision": self.precision,
+            "recall": self.recall,
+            "f1": self.f1
+        }

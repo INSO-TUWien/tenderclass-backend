@@ -112,4 +112,4 @@ class FullTextSvmModel(TenderClassClassifier):
             ('svc', SVC(kernel="linear", random_state=0)),
         ])
 
-        self.model = None
+        self.model = pipeline

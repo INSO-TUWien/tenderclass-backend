@@ -92,10 +92,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/create-from-datasets-model'
+              $ref: '#/components/schemas/dataset-location-model'
       responses:
         '200':
           description: OK
+  /model/validate-on-dataset:
+    post:
+      tags:
+        - ML Model
+      summary: Validate a trained model on a given dataset
+      requestBody:
+        description: Filenames of a positive and negative dataset
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dataset-location-model'
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validation_result'
   /fetch/ted:
     post:
       tags:
@@ -170,7 +189,7 @@ components:
         neg_number: 1000
         pos_search_criteria: " AND PC=[72*]"
         neg_search_criteria: " AND NOT PC=[72*]"
-    create-from-datasets-model:
+    dataset-location-model:
       type: object
       properties:
         pos_filename:
@@ -236,3 +255,30 @@ components:
         languages:
           - "EN"
         dataset_name: "example-dataset"
+    validation_result:
+      type: object
+      properties:
+        tn:
+          type: integer
+          format: integer
+        fp:
+          type: integer
+          format: integer
+        fn:
+          type: integer
+          format: integer
+        tp:
+          type: integer
+          format: integer
+        accuracy:
+          type: number
+          format: double
+        precision:
+          type: number
+          format: double
+        recall:
+          type: number
+          format: double
+        f1:
+          type: number
+          format: double

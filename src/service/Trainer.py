@@ -3,6 +3,7 @@ import random
 import logging
 
 from src.Models.ModelNameModel import ModelNameModel
+from src.entity.ValidationResult import ValidationResult
 from src.persistence.Persistence import Persistence
 from src.service.fetcher.Fetcher import Fetcher
 
@@ -37,6 +38,19 @@ class Trainer:
         labelled_tenders = list(map(lambda x: (x, labels[tender_ids.index(x.id)], tenders)))
 
         self.tender_model.train(labelled_tenders)
+
+    def validate(self, model: FromDatasetsModel) -> ValidationResult:
+        pos_tenders = self.persistence.load(model.pos_filename)
+        neg_tenders = self.persistence.load(model.neg_filename)
+
+        pos_labels = [1] * len(pos_tenders)
+        neg_labels = [0] * len(neg_tenders)
+
+        labelled_tenders = list(zip(pos_tenders, pos_labels)) + list(zip(neg_tenders, neg_labels))
+
+        random.shuffle(labelled_tenders)
+
+        return self.tender_model.validate(labelled_tenders)
 
     def load_and_train(self, model: FromDatasetsModel):
         pos_tenders = self.persistence.load(model.pos_filename)

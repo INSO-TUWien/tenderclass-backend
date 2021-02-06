@@ -1,7 +1,8 @@
 from http.client import BAD_REQUEST
 
-from flask import Blueprint, request, abort
+from flask import Blueprint, request, abort, jsonify
 from src.config import tender_trainer
+from src.entity.ValidationResult import ValidationResult
 from src.validation.create_from_datasets_validation import CreateFromDatasetsValidation
 from src.validation.create_new_validation import CreateNewValidation
 from marshmallow import ValidationError
@@ -35,6 +36,16 @@ def post_train_from_datasets():
     except ValidationError as err:
         abort(BAD_REQUEST, str(err.messages))
 
+@model_blueprint.route("/validate-on-dataset", methods=['POST'])
+def validate_on_datasets():
+    try:
+        model = create_from_datasets_validation.load(request.json)
+
+        restult: ValidationResult = tender_trainer.validate(model)
+
+        return jsonify(restult.toDict())
+    except ValidationError as err:
+        abort(BAD_REQUEST, str(err.messages))
 
 @model_blueprint.route("/save", methods=['POST'])
 def save_model():
