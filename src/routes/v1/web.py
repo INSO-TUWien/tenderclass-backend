@@ -6,7 +6,7 @@ web_blueprint = Blueprint('web_blueprint', __name__)
 
 @web_blueprint.route("/recommendations", methods=['GET'])
 def get_recommendations():
-    # use query parameters to overwrite default count and date
+    # use query parameters to overwrite default count, language and date
     count = int(request.args.get('count'))
     if count is None:
         # download all tenders (indicated by count=0)
