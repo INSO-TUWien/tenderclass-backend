@@ -8,11 +8,10 @@ from flask_cors import CORS
 import logging
 
 # Use src path so that the python interpreter can access all modules
-from src.routes.v1.fetch import fetch_blueprint
-
 sys.path.append(os.getcwd()[:os.getcwd().index('src')])
 
 # import routes
+from src.routes.v1.fetch import fetch_blueprint
 from src.routes.v1.model import model_blueprint
 from src.routes.v1.persistence import persistence_blueprint
 from src.routes.v1.web import web_blueprint
