@@ -29,6 +29,19 @@ class PytorchTransformerConfig:
         self.num_models = 2 if (self.use_title and self.use_desc) else 1
 
     @classmethod
+    def bert_german_full_lite(cls):
+        tokenizer = AutoTokenizer.from_pretrained("distilbert-base-german-cased")
+        model = AutoModel.from_pretrained("distilbert-base-german-cased")
+        max_len_title = 70
+        max_len_desc = 300
+        batch_size = 16
+        epochs = 4
+
+        return PytorchTransformerConfig(tokenizer, model, max_len_title,
+                                        max_len_desc, batch_size, epochs, name="TrainBertLayers",
+                                        freeze_pretrained_layers=False)
+
+    @classmethod
     def bert_german_full(cls):
         tokenizer = AutoTokenizer.from_pretrained("bert-base-german-cased")
         model = AutoModel.from_pretrained("bert-base-german-cased")
