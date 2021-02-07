@@ -4,17 +4,17 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.base import TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, accuracy_score
 import spacy
 import string
 import logging
 
 from src.classifier.TenderClassClassifier import TenderClassClassifier
+from src.entity.LabeledTenderCollection import LabelledTenderCollection
+from src.entity.ValidationResult import ValidationResult
 
 logger = logging.getLogger(__name__)
 
-LANGUAGE = "EN"
+LANGUAGE = "DE"
 MODEL_NAME = "scikit_model"
 punctuations = string.punctuation
 
@@ -24,13 +24,11 @@ class SpacyScikitModel(TenderClassClassifier):
     def __init__(self):
         if LANGUAGE == "DE":
             from spacy.lang.de.stop_words import STOP_WORDS
-            self.nlp = spacy.load('de_core_news_sm')
             self.domain_stopwords = ["Ausschreibung", "Bekanntmachung"]
             from spacy.lang.de import German
             self.parser = German()
         elif LANGUAGE == "EN":
             from spacy.lang.en.stop_words import STOP_WORDS
-            self.nlp = spacy.load('en')
             self.domain_stopwords = ["contract", "system", "service", "tender", "company", "notice", "procurement",
                                      "work", "include", "support", "approximately", "management", "agreement",
                                      "office", "solution", "manage", "product", "design", "program", "project",
@@ -84,7 +82,7 @@ class SpacyScikitModel(TenderClassClassifier):
     def save(self, name):
         joblib.dump(self.pipe, "./data/" + name)
 
-    def train(self, labelled_tenders):
+    def prepare_data(self, labelled_tenders):
         tenders = [i for i, j in labelled_tenders]
         labels = [j for i, j in labelled_tenders]
         titles = self.__convert_to_input(tenders)
@@ -93,18 +91,16 @@ class SpacyScikitModel(TenderClassClassifier):
         T = training_df["title"]
         y = training_df["label"]
 
-        T_train, T_test, y_train, y_test = train_test_split(T, y, test_size=0.1, random_state=42)
-        logger.info("start training")
-        self.pipe.fit(T_train, y_train)
-        logger.info("start testing")
-        y_pred = self.pipe.predict(T_test)
-        logger.info(f"accuracy: {self.pipe.score(T_test, y_test)} , tested with {len(T_test)} instances")
-        tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
-        logger.info(f"tn: {tn} fp: {fp}")
-        logger.info(f"fn: {fn} tp:{tp}")
+        return T, y
 
-        print("Score:")
-        print(accuracy_score(y_test, y_pred))
+    def train(self, labelled_tenders):
+        X, ylabels = self.prepare_data(labelled_tenders)
+        self.pipe.fit(X, ylabels)
+
+    def validate(self, labelled_tenders):
+        X, ylabels = self.prepare_data(labelled_tenders)
+        y_pred = self.pipe.predict(X)
+        return ValidationResult(ylabels, y_pred)
 
     def create_new_model(self):
         vectorizer = CountVectorizer(tokenizer=self.spacy_tokenizer, ngram_range=(1, 2))
