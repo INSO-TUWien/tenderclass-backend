@@ -9,11 +9,15 @@ WORKDIR /
 
 #RUN apk add make gcc musl-dev g++
 
+RUN pip install --upgrade pip
+RUN pip install cython
+
+
+RUN pip install git+https://github.com/huggingface/transformers.git
+
 # we need to install further python packages which are listed in requirements.txt
 COPY requirements.txt ./
 
-RUN pip install --upgrade pip
-RUN pip install cython
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
